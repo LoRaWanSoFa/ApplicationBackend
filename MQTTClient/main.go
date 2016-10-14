@@ -10,13 +10,6 @@ import (
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 )
 
-/*
-broker:   staging.thethingsnetwork.org
-port:     1883
-username: 70B3D57ED00010E3
-password: ZQ/dM4Eix/+9FnfUhMNmwWWG4io96fAxzUqfgFJd6N8=
-DevEUI: 	0000000018A6069D
-*/
 
 //define a function for the default message handler
 var f MQTT.MessageHandler = func(client MQTT.Client, msg MQTT.Message) {
@@ -39,12 +32,12 @@ func main() {
 func oldConnect() {
 	//create a ClientOptions struct setting the broker address, clientid, turn
 	//off trace output and set the default message handler
-	opts := MQTT.NewClientOptions().AddBroker("tcp://staging.thethingsnetwork.org:1883")
+	opts := MQTT.NewClientOptions().AddBroker("")
 	//opts := MQTT.NewClientOptions().AddBroker("tcp://localhost:1883")
-	opts.SetClientID("lora")
+	opts.SetClientID("")
 	opts.SetCleanSession(true)
-	opts.SetUsername("70B3D57ED0001162")
-	opts.SetPassword("C8nzg+pocQVnC6yjuqyi/yrCEGiV9/s8QSQdEuQVuSE=")
+	opts.SetUsername("")
+	opts.SetPassword("")
 	opts.SetDefaultPublishHandler(f)
 
 	//opts.SetDefaultPublishHandler(f)

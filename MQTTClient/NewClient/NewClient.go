@@ -27,8 +27,8 @@ Options:
 func NewConnect() {
 	topic := flag.String("topic", "+/devices/+/up", "The topic name to/from which to publish/subscribe")
 	broker := flag.String("broker", "tcp://iot.eclipse.org:1883", "The broker URI. ex: tcp://10.10.1.1:1883")
-	password := flag.String("password", "C8nzg+pocQVnC6yjuqyi/yrCEGiV9/s8QSQdEuQVuSE=", "The password (optional)")
-	user := flag.String("user", "70B3D57ED0001162", "The User (optional)")
+	password := flag.String("password", "", "The password (optional)")
+	user := flag.String("user", "", "The User (optional)")
 	id := flag.String("id", "testgoid", "The ClientID (optional)")
 	cleansess := flag.Bool("clean", true, "Set Clean Session (default false)")
 	qos := flag.Int("qos", 0, "The Quality of Service 0,1,2 (default 0)")
