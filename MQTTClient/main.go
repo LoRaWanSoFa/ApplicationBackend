@@ -1,15 +1,15 @@
 package main
 
 import (
-	"MQTTClient/NewClient"
 	"fmt"
 	"os"
 	"time"
+
+	"github.com/LoRaWanSoFa/MQTTClient/NewClient"
 	//import the Paho Go MQTT library
 
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 )
-
 
 //define a function for the default message handler
 var f MQTT.MessageHandler = func(client MQTT.Client, msg MQTT.Message) {
