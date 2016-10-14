@@ -28,6 +28,11 @@ vet:
 lint:
 	for pkg in `echo $(GO_PACKAGES)`; do golint $$pkg | grep -vE 'mock|.pb.go'; done
 
+#Go Test
+
+test: $(GO_FILES)
+	go test $(GO_TEST_PACKAGES)
+
 # Go Build
 
 RELEASE_DIR ?= release
