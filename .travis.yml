@@ -9,8 +9,6 @@ go:
     - 1.7
 
 install:
-    - make deps
-    - make cover-deps
 
 before_script:
 
