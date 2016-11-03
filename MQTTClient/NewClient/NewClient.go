@@ -1,21 +1,21 @@
+// Copyright © 2016 The Things Network
+// Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+
 package NewClient
 
 import (
+	"encoding/json"
 	"fmt"
-	"sync"
 	"time"
-	//"github.com/TheThingsNetwork/ttn/utils/random"
+
+	"github.com/TheThingsNetwork/ttn/core"
+	"github.com/TheThingsNetwork/ttn/core/types"
+	"github.com/TheThingsNetwork/ttn/utils/random"
+	"github.com/apex/log"
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 )
 
-// QoS indicates the MQTT Quality of Service level.
-// 0: The broker/client will deliver the message once, with no confirmation.
-// 1: The broker/client will deliver the message at least once, with confirmation required.
-// 2: The broker/client will deliver the message exactly once by using a four step handshake.
-var (
-	PublishQoS   byte = 0x00
-	SubscribeQoS byte = 0x00
-)
+const QoS = 0x02
 
 // Client connects to the MQTT server and can publish/subscribe on uplink, downlink and activations from devices
 type Client interface {
@@ -25,49 +25,27 @@ type Client interface {
 	IsConnected() bool
 
 	// Uplink pub/sub
-	PublishUplink(payload UplinkMessage) Token
-	PublishUplinkFields(appID string, devID string, fields map[string]interface{}) Token
-	SubscribeDeviceUplink(appID string, devID string, handler UplinkHandler) Token
-	SubscribeAppUplink(appID string, handler UplinkHandler) Token
+	PublishUplink(appEUI types.AppEUI, devEUI types.DevEUI, payload core.DataUpAppReq) Token
+	SubscribeDeviceUplink(appEUI types.AppEUI, devEUI types.DevEUI, handler UplinkHandler) Token
+	SubscribeAppUplink(appEUI types.AppEUI, handler UplinkHandler) Token
 	SubscribeUplink(handler UplinkHandler) Token
-	UnsubscribeDeviceUplink(appID string, devID string) Token
-	UnsubscribeAppUplink(appID string) Token
-	UnsubscribeUplink() Token
 
 	// Downlink pub/sub
-	PublishDownlink(payload DownlinkMessage) Token
-	SubscribeDeviceDownlink(appID string, devID string, handler DownlinkHandler) Token
-	SubscribeAppDownlink(appID string, handler DownlinkHandler) Token
+	PublishDownlink(appEUI types.AppEUI, devEUI types.DevEUI, payload core.DataDownAppReq) Token
+	SubscribeDeviceDownlink(appEUI types.AppEUI, devEUI types.DevEUI, handler DownlinkHandler) Token
+	SubscribeAppDownlink(appEUI types.AppEUI, handler DownlinkHandler) Token
 	SubscribeDownlink(handler DownlinkHandler) Token
-	UnsubscribeDeviceDownlink(appID string, devID string) Token
-	UnsubscribeAppDownlink(appID string) Token
-	UnsubscribeDownlink() Token
-
-	// Event pub/sub
-	PublishAppEvent(appID string, eventType string, payload interface{}) Token
-	PublishDeviceEvent(appID string, devID string, eventType string, payload interface{}) Token
-	SubscribeAppEvents(appID string, eventType string, handler AppEventHandler) Token
-	SubscribeDeviceEvents(appID string, devID string, eventType string, handler DeviceEventHandler) Token
-	UnsubscribeAppEvents(appID string, eventType string) Token
-	UnsubscribeDeviceEvents(appID string, devID string, eventType string) Token
 
 	// Activation pub/sub
-	PublishActivation(payload Activation) Token
-	SubscribeDeviceActivations(appID string, devID string, handler ActivationHandler) Token
-	SubscribeAppActivations(appID string, handler ActivationHandler) Token
+	PublishActivation(appEUI types.AppEUI, devEUI types.DevEUI, payload core.OTAAAppReq) Token
+	SubscribeDeviceActivations(appEUI types.AppEUI, devEUI types.DevEUI, handler ActivationHandler) Token
+	SubscribeAppActivations(appEUI types.AppEUI, handler ActivationHandler) Token
 	SubscribeActivations(handler ActivationHandler) Token
-	UnsubscribeDeviceActivations(appID string, devID string) Token
-	UnsubscribeAppActivations(appID string) Token
-	UnsubscribeActivations() Token
 }
 
-// Token is returned on asyncronous functions
 type Token interface {
-	// Wait for the function to finish
 	Wait() bool
-	// Wait for the function to finish or return false after a certain time
 	WaitTimeout(time.Duration) bool
-	// The error associated with the result of the function (nil if everything okay)
 	Error() error
 }
 
@@ -90,72 +68,23 @@ func (t *simpleToken) Error() error {
 	return t.err
 }
 
-type token struct {
-	sync.RWMutex
-	complete chan bool
-	ready    bool
-	err      error
+type UplinkHandler func(client Client, appEUI types.AppEUI, devEUI types.DevEUI, req core.DataUpAppReq)
+type DownlinkHandler func(client Client, appEUI types.AppEUI, devEUI types.DevEUI, req core.DataDownAppReq)
+type ActivationHandler func(client Client, appEUI types.AppEUI, devEUI types.DevEUI, req core.OTAAAppReq)
+
+type defaultClient struct {
+	mqtt MQTT.Client
+	ctx  log.Interface
 }
 
-func newToken() *token {
-	return &token{
-		complete: make(chan bool),
-	}
-}
-
-func (t *token) Wait() bool {
-	t.Lock()
-	defer t.Unlock()
-	if !t.ready {
-		<-t.complete
-		t.ready = true
-	}
-	return t.ready
-}
-
-func (t *token) WaitTimeout(d time.Duration) bool {
-	t.Lock()
-	defer t.Unlock()
-	if !t.ready {
-		select {
-		case <-t.complete:
-			t.ready = true
-		case <-time.After(d):
-		}
-	}
-	return t.ready
-}
-
-func (t *token) flowComplete() {
-	close(t.complete)
-}
-
-func (t *token) Error() error {
-	t.RLock()
-	defer t.RUnlock()
-	return t.err
-}
-
-// DefaultClient is the default MQTT client for The Things Network
-type DefaultClient struct {
-	mqtt          MQTT.Client
-	ctx           Logger
-	subscriptions map[string]MQTT.MessageHandler
-}
-
-// NewClient creates a new DefaultClient
-func NewClient(ctx Logger, id, username, password string, brokers ...string) Client {
-	if ctx == nil {
-		ctx = &noopLogger{}
-	}
-
+func NewClient(ctx log.Interface, id, username, password string, brokers ...string) Client {
 	mqttOpts := MQTT.NewClientOptions()
 
 	for _, broker := range brokers {
 		mqttOpts.AddBroker(broker)
 	}
 
-	mqttOpts.SetClientID(fmt.Sprintf("%s-%s", id, "ABCDEFGHIJKLMNOP"))
+	mqttOpts.SetClientID(fmt.Sprintf("%s-%s", id, random.String(16)))
 	mqttOpts.SetUsername(username)
 	mqttOpts.SetPassword(password)
 
@@ -163,38 +92,26 @@ func NewClient(ctx Logger, id, username, password string, brokers ...string) Cli
 	mqttOpts.SetKeepAlive(30 * time.Second)
 	mqttOpts.SetPingTimeout(10 * time.Second)
 
-	mqttOpts.SetCleanSession(true)
+	// Usually this setting should not be used together with random ClientIDs, but
+	// we configured The Things Network's MQTT servers to handle this correctly.
+	mqttOpts.SetCleanSession(false)
 
 	mqttOpts.SetDefaultPublishHandler(func(client MQTT.Client, msg MQTT.Message) {
-		ctx.Warnf("Received unhandled message: %v", msg)
+		ctx.WithField("message", msg).Warn("Received unhandled message")
 	})
-
-	var reconnecting bool
 
 	mqttOpts.SetConnectionLostHandler(func(client MQTT.Client, err error) {
-		ctx.Warnf("Disconnected (%s). Reconnecting...", err.Error())
-		reconnecting = true
+		ctx.WithError(err).Warn("Disconnected, reconnecting...")
 	})
-
-	ttnClient := &DefaultClient{
-		ctx:           ctx,
-		subscriptions: make(map[string]MQTT.MessageHandler),
-	}
 
 	mqttOpts.SetOnConnectHandler(func(client MQTT.Client) {
-		ctx.Info("Connected to MQTT")
-		if reconnecting {
-			for topic, handler := range ttnClient.subscriptions {
-				ctx.Infof("Re-subscribing to topic: %s", topic)
-				ttnClient.subscribe(topic, handler)
-			}
-			reconnecting = false
-		}
+		ctx.Debug("Connected")
 	})
 
-	ttnClient.mqtt = MQTT.NewClient(mqttOpts)
-
-	return ttnClient
+	return &defaultClient{
+		mqtt: MQTT.NewClient(mqttOpts),
+		ctx:  ctx,
+	}
 }
 
 var (
@@ -204,56 +121,154 @@ var (
 	ConnectRetryDelay = time.Second
 )
 
-// Connect to the MQTT broker. It will retry for ConnectRetries times with a delay of ConnectRetryDelay between retries
-func (c *DefaultClient) Connect() error {
+func (c *defaultClient) Connect() error {
 	if c.mqtt.IsConnected() {
 		return nil
 	}
 	var err error
 	for retries := 0; retries < ConnectRetries; retries++ {
 		token := c.mqtt.Connect()
-		finished := token.WaitTimeout(1 * time.Second)
-		if !finished {
-			c.ctx.Warn("MQTT connection took longer than expected...")
-			token.Wait()
-		}
+		token.Wait()
 		err = token.Error()
 		if err == nil {
 			break
 		}
-		c.ctx.Warnf("Could not connect to MQTT Broker (%s). Retrying...", err.Error())
 		<-time.After(ConnectRetryDelay)
 	}
 	if err != nil {
-		return fmt.Errorf("Could not connect to MQTT Broker (%s).", err)
+		return fmt.Errorf("Could not connect: %s", err)
 	}
 	return nil
 }
 
-func (c *DefaultClient) publish(topic string, msg []byte) Token {
-	return c.mqtt.Publish(topic, PublishQoS, false, msg)
-}
-
-func (c *DefaultClient) subscribe(topic string, handler MQTT.MessageHandler) Token {
-	c.subscriptions[topic] = handler
-	return c.mqtt.Subscribe(topic, SubscribeQoS, handler)
-}
-
-func (c *DefaultClient) unsubscribe(topic string) Token {
-	delete(c.subscriptions, topic)
-	return c.mqtt.Unsubscribe(topic)
-}
-
-// Disconnect from the MQTT broker
-func (c *DefaultClient) Disconnect() {
+func (c *defaultClient) Disconnect() {
 	if !c.mqtt.IsConnected() {
 		return
 	}
-	c.ctx.Debug("Disconnecting from MQTT")
 	c.mqtt.Disconnect(25)
 }
 
-// IsConnected returns true if there is a connection to the MQTT broker
-func (c *DefaultClient) IsConnected() bool {
+func (c *defaultClient) IsConnected() bool {
 	return c.mqtt.IsConnected()
+}
+
+func (c *defaultClient) PublishUplink(appEUI types.AppEUI, devEUI types.DevEUI, dataUp core.DataUpAppReq) Token {
+	topic := DeviceTopic{appEUI, devEUI, Uplink}
+	msg, err := json.Marshal(dataUp)
+	if err != nil {
+		return &simpleToken{fmt.Errorf("Unable to marshal the message payload")}
+	}
+	return c.mqtt.Publish(topic.String(), QoS, false, msg)
+}
+
+func (c *defaultClient) SubscribeDeviceUplink(appEUI types.AppEUI, devEUI types.DevEUI, handler UplinkHandler) Token {
+	topic := DeviceTopic{appEUI, devEUI, Uplink}
+	return c.mqtt.Subscribe(topic.String(), QoS, func(mqtt MQTT.Client, msg MQTT.Message) {
+		// Determine the actual topic
+		topic, err := ParseDeviceTopic(msg.Topic())
+		if err != nil {
+			c.ctx.WithField("topic", msg.Topic()).WithError(err).Warn("Received message on invalid uplink topic")
+			return
+		}
+
+		// Unmarshal the payload
+		dataUp := &core.DataUpAppReq{}
+		err = json.Unmarshal(msg.Payload(), dataUp)
+
+		if err != nil {
+			c.ctx.WithError(err).Warn("Could not unmarshal uplink")
+			return
+		}
+
+		// Call the uplink handler
+		handler(c, topic.AppEUI, topic.DevEUI, *dataUp)
+	})
+}
+
+func (c *defaultClient) SubscribeAppUplink(appEUI types.AppEUI, handler UplinkHandler) Token {
+	return c.SubscribeDeviceUplink(appEUI, types.DevEUI{}, handler)
+}
+
+func (c *defaultClient) SubscribeUplink(handler UplinkHandler) Token {
+	return c.SubscribeDeviceUplink(types.AppEUI{}, types.DevEUI{}, handler)
+}
+
+func (c *defaultClient) PublishDownlink(appEUI types.AppEUI, devEUI types.DevEUI, dataDown core.DataDownAppReq) Token {
+	topic := DeviceTopic{appEUI, devEUI, Downlink}
+	msg, err := json.Marshal(dataDown)
+	if err != nil {
+		return &simpleToken{fmt.Errorf("Unable to marshal the message payload")}
+	}
+	return c.mqtt.Publish(topic.String(), QoS, false, msg)
+}
+
+func (c *defaultClient) SubscribeDeviceDownlink(appEUI types.AppEUI, devEUI types.DevEUI, handler DownlinkHandler) Token {
+	topic := DeviceTopic{appEUI, devEUI, Downlink}
+	return c.mqtt.Subscribe(topic.String(), QoS, func(mqtt MQTT.Client, msg MQTT.Message) {
+		// Determine the actual topic
+		topic, err := ParseDeviceTopic(msg.Topic())
+		if err != nil {
+			c.ctx.WithField("topic", msg.Topic()).WithError(err).Warn("Received message on invalid Downlink topic")
+			return
+		}
+
+		// Unmarshal the payload
+		dataDown := &core.DataDownAppReq{}
+		err = json.Unmarshal(msg.Payload(), dataDown)
+		if err != nil {
+			c.ctx.WithError(err).Warn("Could not unmarshal Downlink")
+			return
+		}
+
+		// Call the Downlink handler
+		handler(c, topic.AppEUI, topic.DevEUI, *dataDown)
+	})
+}
+
+func (c *defaultClient) SubscribeAppDownlink(appEUI types.AppEUI, handler DownlinkHandler) Token {
+	return c.SubscribeDeviceDownlink(appEUI, types.DevEUI{}, handler)
+}
+
+func (c *defaultClient) SubscribeDownlink(handler DownlinkHandler) Token {
+	return c.SubscribeDeviceDownlink(types.AppEUI{}, types.DevEUI{}, handler)
+}
+
+func (c *defaultClient) PublishActivation(appEUI types.AppEUI, devEUI types.DevEUI, activation core.OTAAAppReq) Token {
+	topic := DeviceTopic{appEUI, devEUI, Activations}
+	msg, err := json.Marshal(activation)
+	if err != nil {
+		return &simpleToken{fmt.Errorf("Unable to marshal the message payload")}
+	}
+	return c.mqtt.Publish(topic.String(), QoS, false, msg)
+}
+
+func (c *defaultClient) SubscribeDeviceActivations(appEUI types.AppEUI, devEUI types.DevEUI, handler ActivationHandler) Token {
+	topic := DeviceTopic{appEUI, devEUI, Activations}
+	return c.mqtt.Subscribe(topic.String(), QoS, func(mqtt MQTT.Client, msg MQTT.Message) {
+		// Determine the actual topic
+		topic, err := ParseDeviceTopic(msg.Topic())
+		if err != nil {
+			c.ctx.WithField("topic", msg.Topic()).WithError(err).Warn("Received message on invalid Activations topic")
+			return
+		}
+
+		// Unmarshal the payload
+		activation := &core.OTAAAppReq{}
+		err = json.Unmarshal(msg.Payload(), activation)
+		if err != nil {
+			c.ctx.WithError(err).Warn("Could not unmarshal Activation")
+			return
+		}
+
+		// Call the Activation handler
+		handler(c, topic.AppEUI, topic.DevEUI, *activation)
+	})
+}
+
+func (c *defaultClient) SubscribeAppActivations(appEUI types.AppEUI, handler ActivationHandler) Token {
+	return c.SubscribeDeviceActivations(appEUI, types.DevEUI{}, handler)
+}
+
+func (c *defaultClient) SubscribeActivations(handler ActivationHandler) Token {
+	return c.SubscribeDeviceActivations(types.AppEUI{}, types.DevEUI{}, handler)
 }

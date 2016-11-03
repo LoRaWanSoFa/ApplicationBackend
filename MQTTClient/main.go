@@ -7,6 +7,8 @@ import (
 
 	//import the Paho Go MQTT library
 	"github.com/LoRaWanSoFa/MQTTClient/NewClient"
+	"github.com/TheThingsNetwork/ttn/core"
+	"github.com/TheThingsNetwork/ttn/core/types"
 	"github.com/apex/log"
 	"github.com/apex/log/handlers/text"
 	MQTT "github.com/eclipse/paho.mqtt.golang"
@@ -25,10 +27,10 @@ func messageHandler(client MQTT.Client, msg MQTT.Message) {
 	fmt.Printf("MSG: %s\n", msg.Payload())
 }
 
-func uplinkMessageHandler(client NewClient.Client, appID string, devID string, req NewClient.UplinkMessage) {
-	fmt.Println(appID)
+func uplinkMessageHandler(client NewClient.Client, appEUI types.AppEUI, devEUI types.DevEUI, req core.DataUpAppReq) {
+	fmt.Println(appEUI.GoString())
 	fmt.Println("got a message")
-	fmt.Println(req.PayloadFields)
+	fmt.Println(req)
 }
 
 func main() {
@@ -42,12 +44,11 @@ func main() {
 	}
 	client.Connect()
 	u := uplinkMessageHandler
-	client.SubscribeAppUplink("70B3D57ED0001162", u)
-	client.SubscribeAppUplink("+/devices/+/up", u)
+	eui := types.AppEUI{0x70, 0xB3, 0xD5, 0x7E, 0xD0, 0x00, 0x11, 0x62}
+	client.SubscribeAppUplink(eui, u)
 	time.Sleep(60 * time.Second)
 	time.Sleep(60 * time.Second)
 	time.Sleep(60 * time.Second)
-	client.UnsubscribeAppUplink("70B3D57ED0001162")
 	client.Disconnect()
 }
 
