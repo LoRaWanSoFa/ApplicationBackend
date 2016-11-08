@@ -1,5 +1,8 @@
 package components
 
+type Message interface {
+}
+
 type message struct {
 	payload []byte
 	time    string

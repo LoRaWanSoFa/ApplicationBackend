@@ -50,7 +50,6 @@ func main() {
 	eui := make([]byte, 8)
 	eui, err = hex.DecodeString(applicationData.AppEUI)
 
-	//appEUI := types.AppEUI(eui)
 	EUI := types.AppEUI{eui[0], eui[1], eui[2], eui[3], eui[4], eui[5], eui[6], eui[7]}
 	if err != nil {
 		panic(err)
