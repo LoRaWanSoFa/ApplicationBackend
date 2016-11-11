@@ -54,6 +54,14 @@ $(RELEASE_DIR)/MQTTClient-%: $(GO_FILES)
 
 build: MQTTClient
 
+messageConverter: $(RELEASE_DIR)/messageConverter-$(GOOS)-$(GOARCH)$(GOEXE)
+
+$(RELEASE_DIR)/messageConverter-%: $(GO_FILES)
+	$(GOBUILD) ./main.go
+
+build: messageConverter
+
+
 GOBIN ?= $(GOPATH)/bin
 
 link: build
