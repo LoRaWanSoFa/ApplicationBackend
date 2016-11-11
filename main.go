@@ -5,11 +5,11 @@ package main
 import (
 	"fmt"
 
-	"github.com/LoRaWanSoFa/Core/messageConverter"
+	"github.com/LoRaWanSoFa/Core/MessageConverter"
 )
 
 func main() {
-	test := messageConverter.New()
+	test := MessageConverter.New()
 
 	bytes := []byte{0x3F, 0xB0, 0xFC, 0x00, 0xAA, 0xA0, 0x84, 0x41}
 	fmt.Println(test.ConvertSingleValue(bytes, 2))

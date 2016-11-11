@@ -1,4 +1,4 @@
-package messageConverter
+package MessageConverter
 
 import (
 	"bytes"
