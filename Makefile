@@ -59,7 +59,6 @@ $(RELEASE_DIR)/messageConverter-%: $(GO_FILES)
 
 build: messageConverter MQTTClient
 
-
 GOBIN ?= $(GOPATH)/bin
 
 link: build
@@ -67,6 +66,11 @@ link: build
 	ln -sf $(PWD)/$(RELEASE_DIR)/messageConverter-$(GOOS)-$(GOARCH)$(GOEXE) $(GOBIN)/messageConverter
 
 # Documentation
+
+install:
+	go install -v . ./MQTTClient
+
+dev: install
 
 docs:
 	cd cmd/docs && HOME='$$HOME' go run generate.go > README.md
