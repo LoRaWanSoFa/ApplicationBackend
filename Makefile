@@ -47,9 +47,9 @@ LDFLAGS = -ldflags "-w -X main.gitBranch=${GIT_BRANCH} -X main.gitCommit=${GIT_C
 GOBUILD = CGO_ENABLED=0 GOOS=$(call GOOSfromfilename, $@) GOARCH=$(call GOARCHfromfilename, $@) go build -a -installsuffix cgo ${LDFLAGS} -o "$@"
 
 
-messageConverter: $(RELEASE_DIR)/messageConverter-$(GOOS)-$(GOARCH)$(GOEXE)
+MessageConverter: $(RELEASE_DIR)/MessageConverter-$(GOOS)-$(GOARCH)$(GOEXE)
 
-$(RELEASE_DIR)/messageConverter-%: $(GO_FILES)
+$(RELEASE_DIR)/MessageConverter-%: $(GO_FILES)
 	$(GOBUILD) ./main.go
 
 MQTTClient: $(RELEASE_DIR)/MQTTClient-$(GOOS)-$(GOARCH)$(GOEXE)
@@ -57,13 +57,13 @@ MQTTClient: $(RELEASE_DIR)/MQTTClient-$(GOOS)-$(GOARCH)$(GOEXE)
 $(RELEASE_DIR)/MQTTClient-%: $(GO_FILES)
 	$(GOBUILD) ./MQTTClient/main.go
 
-build: messageConverter MQTTClient
+build: MessageConverter MQTTClient
 
 GOBIN ?= $(GOPATH)/bin
 
 link: build
 	ln -sf $(PWD)/$(RELEASE_DIR)/MQTTClient-$(GOOS)-$(GOARCH)$(GOEXE) $(GOBIN)/MQTTClient
-	ln -sf $(PWD)/$(RELEASE_DIR)/messageConverter-$(GOOS)-$(GOARCH)$(GOEXE) $(GOBIN)/messageConverter
+	ln -sf $(PWD)/$(RELEASE_DIR)/MessageConverter-$(GOOS)-$(GOARCH)$(GOEXE) $(GOBIN)/MessageConverter
 
 # Documentation
 
