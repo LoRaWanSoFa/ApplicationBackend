@@ -13,6 +13,11 @@ BUILD_DATE = $(or $(CI_BUILD_DATE), `date -u +%Y-%m-%dT%H:%M:%SZ`)
 all: deps build
 
 # Deps
+build-deps:
+@command -v govendor > /dev/null || go get "github.com/kardianos/govendor"
+
+deps: build-deps
+	govendor sync -v
 
 dev-deps: deps
 	@command -v mockgen > /dev/null || go get github.com/golang/mock/mockgen
