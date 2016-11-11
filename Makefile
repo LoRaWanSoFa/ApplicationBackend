@@ -14,7 +14,7 @@ all: deps build
 
 # Deps
 build-deps:
-@command -v govendor > /dev/null || go get "github.com/kardianos/govendor"
+	@command -v govendor > /dev/null || go get "github.com/kardianos/govendor"
 
 deps: build-deps
 	govendor sync -v
