@@ -9,7 +9,7 @@ go:
     - 1.7
 
 install:
-
+    - make deps
 before_script:
 
 script:
@@ -18,4 +18,4 @@ script:
     - make vet
 
 after_success:
-- make coveralls
+    - make coveralls
