@@ -47,15 +47,15 @@ LDFLAGS = -ldflags "-w -X main.gitBranch=${GIT_BRANCH} -X main.gitCommit=${GIT_C
 GOBUILD = CGO_ENABLED=0 GOOS=$(call GOOSfromfilename, $@) GOARCH=$(call GOARCHfromfilename, $@) go build -a -installsuffix cgo ${LDFLAGS} -o "$@"
 
 
-MQTTClient: $(RELEASE_DIR)/MQTTClient-$(GOOS)-$(GOARCH)$(GOEXE)
-
-$(RELEASE_DIR)/MQTTClient-%: $(GO_FILES)
-	$(GOBUILD) ./MQTTClient/main.go
-
 messageConverter: $(RELEASE_DIR)/messageConverter-$(GOOS)-$(GOARCH)$(GOEXE)
 
 $(RELEASE_DIR)/messageConverter-%: $(GO_FILES)
 	$(GOBUILD) ./main.go
+
+MQTTClient: $(RELEASE_DIR)/MQTTClient-$(GOOS)-$(GOARCH)$(GOEXE)
+
+$(RELEASE_DIR)/MQTTClient-%: $(GO_FILES)
+	$(GOBUILD) ./MQTTClient/main.go
 
 build: messageConverter MQTTClient
 
