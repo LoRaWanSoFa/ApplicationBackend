@@ -66,6 +66,7 @@ GOBIN ?= $(GOPATH)/bin
 
 link: build
 	ln -sf $(PWD)/$(RELEASE_DIR)/MQTTClient-$(GOOS)-$(GOARCH)$(GOEXE) $(GOBIN)/MQTTClient
+	ln -sf $(PWD)/$(RELEASE_DIR)/messageConverter-$(GOOS)-$(GOARCH)$(GOEXE) $(GOBIN)/messageConverter
 
 # Documentation
 
