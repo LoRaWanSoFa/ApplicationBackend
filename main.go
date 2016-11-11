@@ -5,7 +5,7 @@ package main
 import (
 	"fmt"
 
-	messageConverter "github.com/LoRaWanSoFa/Core/MessageConverter"
+	messageConverter "github.com/LoRaWanSoFa/Core/messageConverter"
 )
 
 func main() {
