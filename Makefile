@@ -8,7 +8,7 @@ BUILD_DATE = $(or $(CI_BUILD_DATE), `date -u +%Y-%m-%dT%H:%M:%SZ`)
 
 # All
 
-.PHONY: all build-deps deps dev-deps fmt vet ttn ttnctl build link docs clean
+.PHONY: all build-deps deps dev-deps fmt vet ttn ttnctl build link docs clean install dev
 
 all: deps build
 
