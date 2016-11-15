@@ -23,6 +23,7 @@ dev-deps: deps
 	@command -v mockgen > /dev/null || go get github.com/golang/mock/mockgen
 	@command -v golint > /dev/null || go get github.com/golang/lint/golint
 	@command -v forego > /dev/null || go get github.com/ddollar/forego
+	@command -v MessageConverter > /dev/null || go get github.com/LoRaWanSoFa/LoRaWanSoFa
 
 fmt:
 	[[ -z "`echo "$(GO_PACKAGES)" | xargs go fmt | tee -a /dev/stderr`" ]]
