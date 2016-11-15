@@ -9,6 +9,7 @@ go:
     - 1.7
 
 install:
+    -make deps
     
 before_script:
 
