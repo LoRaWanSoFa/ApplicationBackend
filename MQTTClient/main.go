@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/LoRaWanSoFa/MQTTClient/NewClient"
+	"github.com/LoRaWanSoFa/LoRaWanSoFa/MQTTClient/NewClient"
 	"github.com/TheThingsNetwork/ttn/core"
 	"github.com/TheThingsNetwork/ttn/core/types"
 	"github.com/apex/log"
