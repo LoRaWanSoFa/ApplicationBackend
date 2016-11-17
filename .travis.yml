@@ -4,4 +4,6 @@ go:
     - 1.7
 
 script:
+    - git clone https://github.com/LoRaWanSoFa/LoRaWanSoFa.git /home/travis/gopath/src/github.com/LoRaWanSoFa
     - go test -v ./...
+ 
