@@ -1,22 +1,7 @@
 language: go
 
-sudo: required
-
-services:
-    - docker
-
 go:
     - 1.7
 
-install:
-    -make deps
-    
-before_script:
-
 script:
-    - make test
-    - make fmt
-    - make vet
-
-after_success:
-    - make coveralls
+    - go test -v ./...
