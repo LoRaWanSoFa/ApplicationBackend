@@ -3,8 +3,11 @@ language: go
 go:
     - 1.7
 
-install:
+before_install:
     - git clone -b v1-staging https://github.com/TheThingsNetwork/ttn.git /home/travis/gopath/src/github.com/TheThingsNetwork/ttn
+    
+install:
+    - go get -t -v ./...
     
 script:
     - go test -v ./...
