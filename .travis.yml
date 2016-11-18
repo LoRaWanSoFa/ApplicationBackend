@@ -10,6 +10,7 @@ before_install:
     - go get -v google.golang.org/grpc
     - go get -v github.com/golang/protobuf/proto
     - go get -v github.com/golang/protobuf/protoc-gen-go
+    - go get -v github.com/gogo/protobuf/protoc-gen-gofast
 
 install:
     - go get -t -v ./...
