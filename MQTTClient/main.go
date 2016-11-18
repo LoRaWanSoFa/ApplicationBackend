@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/LoRaWanSoFa/LoRaWanSoFa/MQTTClient/NewClient"
-	"github.com/TheThingsNetwork/ttn/core"
-	"github.com/TheThingsNetwork/ttn/core/types"
+	"github.com/LoRaWanSoFa/ttn/core"
+	"github.com/LoRaWanSoFa/ttn/core/types"
 	"github.com/apex/log"
 	"github.com/apex/log/handlers/text"
 	yaml "gopkg.in/yaml.v2"
