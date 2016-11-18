@@ -6,9 +6,10 @@ go:
     - 1.7
 
 before_install:
+    - apt-get install protobuf-compiler
     - git clone -b v1-staging https://github.com/TheThingsNetwork/ttn.git /home/travis/gopath/src/github.com/TheThingsNetwork/ttn
-    - go get github.com/golang/protobuf/proto
-    - go get github.com/golang/protobuf/protoc-gen-go
+    - go get -v github.com/golang/protobuf/proto
+    - go get -v github.com/golang/protobuf/protoc-gen-go
 
 install:
     - go get -t -v ./...
