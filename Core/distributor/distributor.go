@@ -1,6 +1,6 @@
 package distributor
 
-import "github.com/LoRaWanSoFa/Components"
+import components "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
 
 type Distributor interface {
 }

@@ -8,9 +8,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/TheThingsNetwork/ttn/core"
-	"github.com/TheThingsNetwork/ttn/core/types"
-	"github.com/TheThingsNetwork/ttn/utils/random"
+	"github.com/LoRaWanSoFa/ttn/core"
+	"github.com/LoRaWanSoFa/ttn/core/types"
+	"github.com/LoRaWanSoFa/ttn/utils/random"
 	"github.com/apex/log"
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 )

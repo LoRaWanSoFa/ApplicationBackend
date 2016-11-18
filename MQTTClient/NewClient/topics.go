@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"regexp"
 
-	"github.com/TheThingsNetwork/ttn/core/types"
+	"github.com/LoRaWanSoFa/ttn/core/types"
 )
 
 // DeviceTopicType represents the type of a device topic
