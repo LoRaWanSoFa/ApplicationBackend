@@ -4,7 +4,6 @@ go:
     - 1.7
 
 install:
-    - git clone -b travis https://github.com/LoRaWanSoFa/LoRaWanSoFa.git /home/travis/gopath/src/github.com/LoRaWanSoFa/LoRaWanSoFa
     - git clone -b v1-staging https://github.com/TheThingsNetwork/ttn.git /home/travis/gopath/src/github.com/TheThingsNetwork/ttn
     
 script:
