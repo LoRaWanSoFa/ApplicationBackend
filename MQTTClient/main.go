@@ -21,6 +21,15 @@ func uplinkMessageHandler(client NewClient.Client, appEUI types.AppEUI, devEUI t
 	fmt.Println("got a message")
 	fmt.Println(fmt.Sprintf("%s", devEUI))
 	fmt.Println(req)
+	fmt.Println("-------------")
+}
+
+func downlinkMessageHandler(client NewClient.Client, appEUI types.AppEUI, devEUI types.DevEUI, req core.DataDownAppReq) {
+	fmt.Println(appEUI.GoString())
+	fmt.Println("got a downlink message")
+	fmt.Println(fmt.Sprintf("%s", devEUI))
+	fmt.Println(req)
+	fmt.Println("-------------")
 }
 
 func main() {
@@ -28,7 +37,7 @@ func main() {
 	log.SetHandler(text.New(os.Stderr))
 	// START: yaml config block
 	goPath := os.Getenv("GOPATH")
-	yamlFile, err := ioutil.ReadFile(filepath.Join(goPath, "/src/github.com/LoRaWanSoFa/config.yaml"))
+	yamlFile, err := ioutil.ReadFile(filepath.Join(goPath, "/src/github.com/LoRaWanSoFa/LoRaWanSoFa/config.yaml"))
 	if err != nil {
 		panic(err)
 	}
@@ -40,12 +49,13 @@ func main() {
 	// END: yaml config block
 
 	ctx := log.WithField("Test", "AnotherOne")
-	client := NewClient.NewClient(ctx, "ttnctl", applicationData.AppEUI, applicationData.Password, "tcp://staging.thethingsnetwork.org:1883")
+	client := NewClient.NewClient(ctx, "ttnctl", applicationData.AppEUI, applicationData.Password, applicationData.Mail)
 	if err = client.Connect(); err != nil {
 		ctx.WithError(err).Fatal("Could not connect")
 	}
 	client.Connect()
 	u := uplinkMessageHandler
+	d := downlinkMessageHandler
 	//var eui []byte
 	eui := make([]byte, 8)
 	eui, err = hex.DecodeString(applicationData.AppEUI)
@@ -55,6 +65,8 @@ func main() {
 		panic(err)
 	}
 	client.SubscribeAppUplink(EUI, u)
+	client.SubscribeAppDownlink(EUI, d)
+
 	time.Sleep(18000 * time.Second)
 	client.Disconnect()
 }
