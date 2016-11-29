@@ -49,7 +49,7 @@ func main() {
 	// END: yaml config block
 
 	ctx := log.WithField("Test", "AnotherOne")
-	client := NewClient.NewClient(ctx, "ttnctl", applicationData.AppEUI, applicationData.Password, applicationData.Mail)
+	client := NewClient.NewClient(ctx, "ttnctl", applicationData.AppEUI, applicationData.Password, applicationData.Address)
 	if err = client.Connect(); err != nil {
 		ctx.WithError(err).Fatal("Could not connect")
 	}
