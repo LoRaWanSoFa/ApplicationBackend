@@ -1,6 +1,9 @@
 package DatabaseConnector
 
-import "testing"
+import (
+	"testing"
+	"time"
+)
 
 func TestNewWorker(t *testing.T) {
 	WorkerQueue_test := make(chan chan WorkRequest, 1)
@@ -12,25 +15,22 @@ func TestNewWorker(t *testing.T) {
 }
 
 func TestStart(t *testing.T) {
-	// StartDispatcher(1)
-	// worker := NewWorker(1, WorkerQueue)
-	// if 1 != worker.ID {
-	// 	t.Errorf("Expected %d, was %d", 1, worker.ID)
-	// }
-	// result := make(chan WorkResult)
-	// defer close(result)
-	// args := make([]interface{}, 1)
-	// go func() {
-	// 	WorkQueue <- WorkRequest{Query: "", Arguments: args, ResultChannel: result, F: func(w *WorkRequest) {
-	// 		w.ResultChannel <- WorkResult{Result: true, err: nil}
-	// 		result <- WorkResult{Result: true, err: nil}
-	// 	}}
-	// }()
-	// fail := <-result
-	// if fail.Result != true {
-	// 	t.Errorf("Expected %t, was %+v", true, fail)
-	// }
-	// worker.Stop()
+	//By stesting the StartDispatcher we also test the start function.
+	StartDispatcher(1)
+
+	result := make(chan WorkResult)
+	args := make([]interface{}, 1)
+	go func(args []interface{}, result chan (WorkResult)) {
+		WorkQueue <- WorkRequest{Query: "", Arguments: args, ResultChannel: result, F: func(w *WorkRequest) {
+			w.ResultChannel <- WorkResult{Result: true, err: nil}
+		}}
+	}(args, result)
+	time.Sleep(200 * time.Millisecond)
+	fail := <-result
+	if fail.Result != true {
+		t.Errorf("Expected %t, was %+v", true, fail)
+	}
+	defer close(result)
 
 }
 
