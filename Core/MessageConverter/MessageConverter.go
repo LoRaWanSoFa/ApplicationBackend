@@ -3,20 +3,23 @@ package MessageConverter
 import (
 	"bytes"
 	"encoding/binary"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 type conversionType int
 
 // conversion types that can be received from messages
 const (
-	conversionUint   conversionType = iota // 0
-	conversionInt                          // 1
-	conversionFloat                        // 2
-	conversionString                       // 3
-	conversionBool                         // 4
+	conversionUint      conversionType = iota // 0
+	conversionInt                             // 1
+	conversionFloat                           // 2
+	conversionString                          // 3
+	conversionHexString                       // 4
+	conversionBool                            // 5
 )
 
 type MessageConverter interface {
@@ -34,7 +37,7 @@ func New() MessageConverter {
 // Converts a single value that was received from a message to a string
 // representation of the received value. The conversion int refers to the type of
 // the value that has been received. The types that can be input are uint(0),
-// int(1), float(2), string(3) or bool(4).
+// int(1), float(2), string(3), hexString(4) or bool(5).
 // Returns an error when an invalid type is chosen.
 func (m *messageConverter) ConvertSingleValue(payload []byte, conversion int) (string, error) {
 	var result string
@@ -48,6 +51,8 @@ func (m *messageConverter) ConvertSingleValue(payload []byte, conversion int) (s
 		result, err = convertFloat(payload)
 	case conversionString:
 		result, err = convertString(payload)
+	case conversionHexString:
+		result, err = convertHexString(payload)
 	case conversionBool:
 		result, err = convertBool(payload)
 	default:
@@ -132,8 +137,17 @@ func convertFloat(payload []byte) (string, error) {
 }
 
 // Conversion method for the string type.
+// A byte is replaced with the corresponding value in the ascii table.
 func convertString(payload []byte) (string, error) {
 	return string(payload), nil
+}
+
+// Conversion method for hex string, bytes that are being put in are converted
+// to hex and returned:
+// 0xAB is converted to AB
+// Returned values are upper case.
+func convertHexString(payload []byte) (string, error) {
+	return strings.ToUpper(hex.EncodeToString(payload)), nil
 }
 
 // Conversion method for the bool type.

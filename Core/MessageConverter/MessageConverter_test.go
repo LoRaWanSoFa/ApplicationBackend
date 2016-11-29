@@ -105,7 +105,7 @@ func TestFloatTypes(t *testing.T) {
 	}
 }
 
-func TestStringTypes(t *testing.T) {
+func TestStringConversion(t *testing.T) {
 	var testData = []struct {
 		expectedResult string // expectedResult
 		payload        []byte // input
@@ -138,20 +138,45 @@ func TestBooleanTypes(t *testing.T) {
 	}
 	messageConverter := New()
 	for _, item := range testData {
-		result, _ := messageConverter.ConvertSingleValue(item.payload, 4)
+		result, _ := messageConverter.ConvertSingleValue(item.payload, 5)
 		if result != item.expectedResult {
 			t.Errorf("Expected %s, was %s with payload %v", item.expectedResult, result, item.payload)
 		}
 	}
-	_, err := messageConverter.ConvertSingleValue(invalidByteArray, 4)
+	_, err := messageConverter.ConvertSingleValue(invalidByteArray, 5)
 	if err == nil {
 		t.Errorf("Boolean message length should be invalid and produce an error %v", invalidByteArray)
 	}
 }
 
+func TestHexStringConversion(t *testing.T) {
+	var testData = []struct {
+		expectedResult string // expectedResult
+		payload        []byte // input
+	}{
+		{"FF", validByteArrays[0]},
+		{"00", validByteArrays[1]},
+		{"99", validByteArrays[2]},
+		{"9923", validByteArrays[3]},
+		{"A2CB", validByteArrays[4]},
+		{"A2CBF2C3", validByteArrays[5]},
+		{"11111111", validByteArrays[6]},
+		{"123456789ABCDEF0", validByteArrays[7]},
+		{"3B172492A8F29D2E", validByteArrays[8]},
+		{"3B1724", []byte{0x3B, 0x17, 0x24}}, //testing a three length slice
+	}
+	messageConverter := New()
+	for _, item := range testData {
+		result, _ := messageConverter.ConvertSingleValue(item.payload, 4)
+		if result != item.expectedResult {
+			t.Errorf("Expected %s, was %s with payload %v", item.expectedResult, result, item.payload)
+		}
+	}
+}
+
 func TestInvalidType(t *testing.T) {
 	messageConverter := New()
-	_, err := messageConverter.ConvertSingleValue(invalidByteArray, 5)
+	_, err := messageConverter.ConvertSingleValue(invalidByteArray, 99)
 	if err == nil {
 		t.Errorf("Boolean message length should be invalid and produce an error %v", invalidByteArray)
 	}
