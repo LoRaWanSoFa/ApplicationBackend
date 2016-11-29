@@ -6,7 +6,7 @@ import (
 	"log"
 	"sync"
 
-	mdl "github.com/LoRaWanSoFa/Components"
+	mdl "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
 	_ "github.com/lib/pq"
 )
 

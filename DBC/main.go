@@ -4,8 +4,8 @@ import (
 	"log"
 	"time"
 
-	mdl "github.com/LoRaWanSoFa/Components"
-	dbc "github.com/LoRaWanSoFa/DBC/DatabaseConnector"
+	mdl "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
+	dbc "github.com/LoRaWanSoFa/LoRaWanSoFa/DBC/DatabaseConnector"
 	_ "github.com/lib/pq"
 )
 
