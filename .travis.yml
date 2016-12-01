@@ -10,7 +10,7 @@ go:
 
 before_install:
 
-    - docker-compose -f "./test/testDatabase/docker-compose.yml" up -d
+    - docker-compose -f "./test/testDatabase/docker-compose.yml" up
     - sudo apt-get install protobuf-compiler
     - go get -v google.golang.org/grpc
     - go get -v github.com/golang/protobuf/proto
@@ -23,7 +23,7 @@ install:
 
 before_script:
     - cp config.yaml.sample config.yaml
-    - docker inspect -f '{{.Name}} - {{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -q) 
+    - docker inspect -f '{{.Name}} - {{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -q)
 
 script:
     - go test -v ./...

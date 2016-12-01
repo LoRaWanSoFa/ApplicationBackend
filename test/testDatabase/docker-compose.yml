@@ -4,10 +4,5 @@ services:
   postgres-db:
     restart: on-failure:10
     build: ./image
-    environment:
-      - DB_HOST=localhost
-      - DB_NAME=lorawan
-      - DB_USER=docker
-      - DB_PASSWORD=docker
     ports:
       - "5432"
