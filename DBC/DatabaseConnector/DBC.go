@@ -3,24 +3,11 @@ package DatabaseConnector
 import (
 	"database/sql"
 	"fmt"
-	"io/ioutil"
 	"log"
-	"os"
-	"path/filepath"
 	"sync"
 
 	mdl "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
 	_ "github.com/lib/pq"
-	yaml "gopkg.in/yaml.v2"
-)
-
-const (
-	DB_USER     = "docker"
-	DB_PASSWORD = "docker"
-	DB_NAME     = "lorawan"
-	DB_NETWORK  = "127.18.0.2" //not used
-	DB_PORT     = 5432
-	DBC_WORKERS = 20
 )
 
 type DatabaseConnector struct {
@@ -55,21 +42,8 @@ var WorkQueue = make(chan WorkRequest, 100)
 // Get the instantiated instance of the DatabaseConnector or create it.
 func GetInstance() *DatabaseConnector {
 	once.Do(func() {
-		// START: yaml config block
-		goPath := os.Getenv("GOPATH")
-		yamlFile, err := ioutil.ReadFile(filepath.Join(goPath, "/src/github.com/LoRaWanSoFa/LoRaWanSoFa/config.yaml"))
-		if err != nil {
-			panic(err)
-		}
-		dbData := DatabaseData{}
-		log.Printf("%+v", string(yamlFile))
-		err = yaml.Unmarshal(yamlFile, &dbData)
-		if err != nil {
-			panic(err)
-		}
-		log.Printf("%+v", dbData)
-		// END: yaml config block
-		dbConnectionInfo := fmt.Sprintf("user=%s password=%s dbname=%s port=%v sslmode=disable", DB_USER, DB_PASSWORD, DB_NAME, DB_PORT)
+		settings := mdl.GetConfiguration().Db
+		dbConnectionInfo := fmt.Sprintf("user=%s password=%s dbname=%s port=%v sslmode=disable", settings.User, settings.Password, settings.Name, settings.Port)
 		println(dbConnectionInfo)
 		actualDb, err := sql.Open("postgres", dbConnectionInfo)
 		instantiated = newDBC(actualDb)
@@ -77,7 +51,7 @@ func GetInstance() *DatabaseConnector {
 			log.Fatal(err)
 		}
 		log.Print("not connected yet")
-		StartDispatcher(DBC_WORKERS)
+		StartDispatcher(settings.NumberOfWorkers)
 	})
 	return instantiated
 }

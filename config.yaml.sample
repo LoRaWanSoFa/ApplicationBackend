@@ -7,5 +7,5 @@ db:
   Password:
   Name:
   Network:
-  Port:
-  NumberOfWorkers: 
+  Port: 
+  NumberOfWorkers: 20
