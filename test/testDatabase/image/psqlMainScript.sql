@@ -7,14 +7,17 @@
 
 -- Started on 2016-12-01 12:44:40
 
-CREATE ROLE admin LOGIN
-  SUPERUSER INHERIT CREATEDB CREATEROLE NOREPLICATION;
-
-CREATE USER docker WITH SUPERUSER PASSWORD 'docker';
 
 CREATE DATABASE lorawan;
 \c lorawan
 
+CREATE ROLE admin LOGIN
+  SUPERUSER INHERIT CREATEDB CREATEROLE NOREPLICATION;
+
+CREATE ROLE docker LOGIN
+  SUPERUSER INHERIT CREATEDB CREATEROLE NOREPLICATION;
+  
+CREATE USER docker WITH SUPERUSER PASSWORD 'docker';
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -27,7 +30,7 @@ SET row_security = off;
 
 --
 -- TOC entry 1 (class 3079 OID 12393)
--- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner:
 --
 
 CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
@@ -36,7 +39,7 @@ CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 --
 -- TOC entry 2217 (class 0 OID 0)
 -- Dependencies: 1
--- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner:
 --
 
 COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
@@ -669,4 +672,3 @@ ALTER TABLE ONLY sensors
 --
 -- PostgreSQL database dump complete
 --
-
