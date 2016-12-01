@@ -2,10 +2,15 @@ language: go
 
 sudo: required
 
+services:
+    - docker
+
 go:
     - 1.7
 
 before_install:
+
+    - docker-compose -f "./test/testDatabase/docker-compose.yml" up -d
     - sudo apt-get install protobuf-compiler
     - go get -v google.golang.org/grpc
     - go get -v github.com/golang/protobuf/proto
@@ -15,6 +20,9 @@ before_install:
 
 install:
     - go get -t -v ./...
+
+before_script:
+    - cp config.yaml.sample config.yaml
 
 script:
     - go test -v ./...
