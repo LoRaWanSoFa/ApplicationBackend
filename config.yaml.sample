@@ -6,6 +6,6 @@ db:
   User: docker
   Password: docker
   Name: lorawan
-  Network: localhost
+  Network: 172.18.0.2
   Port: 5432
   NumberOfWorkers: 20
