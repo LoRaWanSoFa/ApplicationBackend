@@ -23,7 +23,7 @@ func main() {
 	//log.Println(dbc.GetNodeSensors("A4C12BF"))
 	//log.Println(dbc.GetNodeSensors("A4C12B2F"))
 	//log.Println("DONE")
-
+	dbc.GetNodeSensors("")
 	sensors := dbc.GetNodeSensors("A4C12BF")
 	m := mdl.NewMessageUplink(4, "A4C12BF")
 	m.AddPayload([]byte("payload"), sensors[0])

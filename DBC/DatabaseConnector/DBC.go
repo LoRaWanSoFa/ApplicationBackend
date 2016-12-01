@@ -3,11 +3,15 @@ package DatabaseConnector
 import (
 	"database/sql"
 	"fmt"
+	"io/ioutil"
 	"log"
+	"os"
+	"path/filepath"
 	"sync"
 
 	mdl "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
 	_ "github.com/lib/pq"
+	yaml "gopkg.in/yaml.v2"
 )
 
 const (
@@ -51,6 +55,20 @@ var WorkQueue = make(chan WorkRequest, 100)
 // Get the instantiated instance of the DatabaseConnector or create it.
 func GetInstance() *DatabaseConnector {
 	once.Do(func() {
+		// START: yaml config block
+		goPath := os.Getenv("GOPATH")
+		yamlFile, err := ioutil.ReadFile(filepath.Join(goPath, "/src/github.com/LoRaWanSoFa/LoRaWanSoFa/config.yaml"))
+		if err != nil {
+			panic(err)
+		}
+		dbData := DatabaseData{}
+		log.Printf("%+v", string(yamlFile))
+		err = yaml.Unmarshal(yamlFile, &dbData)
+		if err != nil {
+			panic(err)
+		}
+		log.Printf("%+v", dbData)
+		// END: yaml config block
 		dbConnectionInfo := fmt.Sprintf("user=%s password=%s dbname=%s port=%v sslmode=disable", DB_USER, DB_PASSWORD, DB_NAME, DB_PORT)
 		println(dbConnectionInfo)
 		actualDb, err := sql.Open("postgres", dbConnectionInfo)

@@ -1,7 +1,5 @@
 package DatabaseConnector
 
-import "fmt"
-
 func NewWorker(id int, workerQueue chan chan WorkRequest) Worker {
 	// Create, and return the worker.
 	worker := Worker{
@@ -28,11 +26,11 @@ func (w *Worker) Start() {
 
 			select {
 			case work := <-w.Work:
-				fmt.Printf("worker%d: executing:  %s %s\n", w.ID, work.Query, work.Arguments)
+				//fmt.Printf("worker%d: executing:  %s %s\n", w.ID, work.Query, work.Arguments)
 				work.F(&work)
 			case <-w.QuitChan:
 				// We have been asked to stop.
-				fmt.Printf("worker%d stopping\n", w.ID)
+				//fmt.Printf("worker%d stopping\n", w.ID)
 				return
 			}
 		}

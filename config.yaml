@@ -1,4 +1,11 @@
---- # ApplicationData
-AppEUI:
-Password:
-Address:
+Mqtt:
+  AppEUI:
+  Password:
+  Address:
+Db:
+  User:
+  Password:
+  Name:
+  Network:
+  Port:
+  NumberOfWorkers:

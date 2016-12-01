@@ -30,6 +30,10 @@ func TestStart(t *testing.T) {
 	if fail.Result != true {
 		t.Errorf("Expected %t, was %+v", true, fail)
 	}
+	if StopWorker() != true {
+		t.Errorf("Could not stop the worker!")
+	}
+	//For 100% coverage we will add a fucntion to stop the worker
 	defer close(result)
 
 }
