@@ -43,7 +43,7 @@ var WorkQueue = make(chan WorkRequest, 100)
 func GetInstance() *DatabaseConnector {
 	once.Do(func() {
 		settings := mdl.GetConfiguration().Db
-		dbConnectionInfo := fmt.Sprintf("user=%s password=%s dbname=%s port=%v sslmode=disable", settings.User, settings.Password, settings.Name, settings.Port)
+		dbConnectionInfo := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%v sslmode=disable", settings.User, settings.Password, settings.Name, settings.Network, settings.Port)
 		println(dbConnectionInfo)
 		actualDb, err := sql.Open("postgres", dbConnectionInfo)
 		instantiated = newDBC(actualDb)
@@ -153,9 +153,10 @@ func AddMessage(devEUI string) (mdl.MessageUplinkI, error) {
 }
 
 //Get a message
-// TODO define return type
-func GetMessage(MessageId []int) {
-	// TODO define return type
+func StoreMessagePayloads(message mdl.MessageUplinkI) error {
+	message.GetPayloads()
+
+	return nil
 }
 
 //Get messages from one node
