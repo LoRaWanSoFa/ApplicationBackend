@@ -1,11 +1,11 @@
-Mqtt:
+mqtt:
   AppEUI:
   Password:
   Address:
-Db:
+db:
   User:
   Password:
   Name:
   Network:
   Port:
-  NumberOfWorkers:
+  NumberOfWorkers: 
