@@ -3,9 +3,9 @@ mqtt:
   Password:
   Address:
 db:
-  User:
-  Password:
-  Name:
-  Network:
-  Port: 
+  User: docker
+  Password: docker
+  Name: lorawan
+  Network: localhost
+  Port: 5432
   NumberOfWorkers: 20

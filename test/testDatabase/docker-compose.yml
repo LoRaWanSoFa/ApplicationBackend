@@ -1,0 +1,13 @@
+version: "2"
+
+services:
+  postgres-db:
+    restart: on-failure:10
+    build: ./image
+    volumes:
+      - "db-data:/var/lib/postgresql/data"
+    ports:
+      - "5432"
+
+volumes:
+  db-data:
