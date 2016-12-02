@@ -56,7 +56,7 @@ func TestUpdateNode(t *testing.T) {
 }
 
 func TestDeleteNode(t *testing.T) {
-	testConnector.DeleteSensor(testData.nodeId, testData.sensorId)
+	testConnector.DeleteNode(testData.nodeId)
 }
 
 func TestNewSensor(t *testing.T) {
