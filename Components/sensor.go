@@ -4,15 +4,15 @@ type SensorI interface {
 }
 
 type Sensor struct {
-	id                    int64
-	ioType                int64 //NotNeeded
-	ioAddress             int   //NotNeeded
-	numberOfValues        int
-	lenghtOfValues        int
-	headerOrder           int
-	description           string //NotNeeded
-	conversion_expression string
-	dataType              int // or int or string, or anything that shows what type of data this sensor is returning
+	Id                    int64
+	IoType                int64 //NotNeeded
+	IoAddress             int   //NotNeeded
+	NumberOfValues        int
+	LenghtOfValues        int
+	HeaderOrder           int
+	Description           string //NotNeeded
+	Conversion_expression string
+	DataType              int // or int or string, or anything that shows what type of data this sensor is returning
 }
 
 func NewHeaderSensor(
