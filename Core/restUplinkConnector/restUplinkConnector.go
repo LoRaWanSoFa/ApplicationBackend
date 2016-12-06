@@ -1,4 +1,4 @@
-package distributor
+package restUplink
 
 import (
 	"fmt"
