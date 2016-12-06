@@ -15,6 +15,9 @@ func TestNewMessageUplink(t *testing.T) {
 	default:
 		t.Errorf("Type unknown: %v", v)
 	}
+	if m.GetDevEUI() != "devEUI" {
+		t.Errorf("Expected %s, was %s", "devEUI", m.GetDevEUI())
+	}
 }
 
 func TestAddPayload(t *testing.T) {
