@@ -8,9 +8,9 @@ var messages Messages
 
 // Give us some seed data
 func init() {
-	RepoCreateMessage(Message{Name: "Write presentation"})
-	RepoCreateMessage(Message{Name: "Host meetup"})
-	RepoCreateMessage(Message{Name: "Test message, wo ist meine id amk"})
+	RepoCreateMessage(Message{Id: 1})
+	RepoCreateMessage(Message{Id: 2})
+	RepoCreateMessage(Message{Id: 3})
 }
 
 func RepoFindMessage(id int) Message {
