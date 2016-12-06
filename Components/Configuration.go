@@ -1,6 +1,7 @@
 package components
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -34,16 +35,29 @@ func GetConfiguration() DatabaseData {
 		goPath := os.Getenv("GOPATH")
 		yamlFile, err := ioutil.ReadFile(filepath.Join(goPath, "/src/github.com/LoRaWanSoFa/LoRaWanSoFa/config.yaml"))
 		if err != nil {
-			panic(err)
+			return
 		}
-		//log.Printf("%+v", string(yamlFile))
 		settings = DatabaseData{}
 		err = yaml.Unmarshal(yamlFile, &settings)
 		if err != nil {
-			panic(err)
+			fmt.Println(err)
+			return
 		}
-		//log.Printf("%+v", dbData)
 		// END: yaml config block
 	})
+	return settings
+}
+
+func ReloadConfig() DatabaseData {
+	goPath := os.Getenv("GOPATH")
+	yamlFile, err := ioutil.ReadFile(filepath.Join(goPath, "/src/github.com/LoRaWanSoFa/LoRaWanSoFa/config.yaml"))
+	if err != nil {
+		return settings
+	}
+	settings = DatabaseData{}
+	err = yaml.Unmarshal(yamlFile, &settings)
+	if err != nil {
+		fmt.Println(err)
+	}
 	return settings
 }
