@@ -1,8 +1,5 @@
 package components
 
-type SensorI interface {
-}
-
 type Sensor struct {
 	Id                    int64
 	IoType                int64 //NotNeeded

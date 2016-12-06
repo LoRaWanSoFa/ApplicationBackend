@@ -2,6 +2,7 @@ package DatabaseConnector
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 	"sync"
@@ -15,6 +16,7 @@ type DatabaseConnector struct {
 	CheckDevEUISTMT   *sql.Stmt
 	GetNodeHeaderSTMT *sql.Stmt
 	InsertMessageSTMT *sql.Stmt
+	InsertPayloadSTMT *sql.Stmt
 }
 
 type WorkRequest struct {
@@ -78,6 +80,12 @@ func Connect() error {
 		"deveui, created_at, down) " +
 		"VALUES ($1, NOW(), false) " +
 		"RETURNING id;")
+	if err != nil {
+		return err
+	}
+	db.InsertPayloadSTMT, err = db.Database.Prepare("INSERT INTO public.message_payloads(" +
+		"message_id, sensor_id, payload) " +
+		"VALUES ($1, $2, $3);")
 	return err
 }
 
@@ -154,9 +162,29 @@ func AddMessage(devEUI string) (mdl.MessageUplinkI, error) {
 
 //Get a message
 func StoreMessagePayloads(message mdl.MessageUplinkI) error {
-	message.GetPayloads()
-
+	if message == nil {
+		return errors.New("nil given as message parameter")
+	}
+	if message.GetId() == 0 {
+		return errors.New("Message has not been initalized/stored")
+	}
+	payloads := message.GetPayloads()
+	if len(payloads) == 0 {
+		return errors.New("Nothing to store!")
+	}
+	var parameters []interface{}
+	for _, payload := range payloads {
+		parameters = append(parameters, message.GetId())        //message id
+		parameters = append(parameters, payload.GetSensor().Id) //sensor id
+		parameters = append(parameters, payload.GetPayload())   //payload
+		log.Printf("parameters: %+v", parameters)
+	}
 	return nil
+}
+
+func getIndex(i int) string {
+	i++
+	return string(i)
 }
 
 //Get messages from one node
