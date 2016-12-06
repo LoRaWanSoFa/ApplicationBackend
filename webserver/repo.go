@@ -4,38 +4,38 @@ import "fmt"
 
 var currentId int
 
-var todos Todos
+var messages Messages
 
 // Give us some seed data
 func init() {
-	RepoCreateTodo(Todo{Name: "Write presentation"})
-	RepoCreateTodo(Todo{Name: "Host meetup"})
-	RepoCreateTodo(Todo{Name: "Test todo, wo ist meine id amk"})
+	RepoCreateMessage(Message{Name: "Write presentation"})
+	RepoCreateMessage(Message{Name: "Host meetup"})
+	RepoCreateMessage(Message{Name: "Test message, wo ist meine id amk"})
 }
 
-func RepoFindTodo(id int) Todo {
-	for _, t := range todos {
+func RepoFindMessage(id int) Message {
+	for _, t := range messages {
 		if t.Id == id {
 			return t
 		}
 	}
 	// return empty Todo if not found
-	return Todo{}
+	return Message{}
 }
 
-func RepoCreateTodo(t Todo) Todo {
+func RepoCreateMessage(t Message) Message {
 	currentId += 1
 	t.Id = currentId
-	todos = append(todos, t)
+	messages = append(messages, t)
 	return t
 }
 
-func RepoDestroyTodo(id int) error {
-	for i, t := range todos {
+func RepoDestroyMessage(id int) error {
+	for i, t := range messages {
 		if t.Id == id {
-			todos = append(todos[:i], todos[i+1:]...)
+			messages = append(messages[:i], messages[i+1:]...)
 			return nil
 		}
 	}
-	return fmt.Errorf("Could not find Todo with id of %d to delete", id)
+	return fmt.Errorf("Could not find Message with id of %d to delete", id)
 }
