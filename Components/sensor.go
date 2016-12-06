@@ -1,15 +1,15 @@
 package components
 
 type Sensor struct {
-	Id                    int64
-	IoType                int64 //NotNeeded
-	IoAddress             int   //NotNeeded
-	NumberOfValues        int
-	LenghtOfValues        int
-	HeaderOrder           int
-	Description           string //NotNeeded
-	Conversion_expression string
-	DataType              int // or int or string, or anything that shows what type of data this sensor is returning
+	Id                    int64  //sensor.id
+	IoType                int64  //NotNeeded
+	IoAddress             int    //NotNeeded
+	NumberOfValues        int    //lenght of bytes that belong to this sensor (between 1 and 8)
+	LenghtOfValues        int    //number of values that belong to this sensor (1,2,4 or 8)
+	HeaderOrder           int    //index in which the messages are send that belong to this sensor
+	Description           string //NotNeeded - user input
+	Conversion_expression string //math expression that transforms the message
+	DataType              int    // or int or string, or anything that shows what type of data this sensor is returning
 }
 
 func NewHeaderSensor(
