@@ -8,6 +8,9 @@ import (
 )
 
 func TestConnect(t *testing.T) {
+	if !isOffline() {
+		t.Errorf("Already initialized before connecting")
+	}
 	errPing := Connect()
 	if errPing != nil {
 		t.Errorf("Could not do Connect()\n%+v", errPing)

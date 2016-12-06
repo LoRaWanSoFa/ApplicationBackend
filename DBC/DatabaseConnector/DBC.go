@@ -230,9 +230,16 @@ func GetNodeSensors(devEUI string) []mdl.Sensor {
 		w.ResultChannel <- WorkResult{Result: sensors, err: err}
 	}}
 	var workResult = <-result
-	checkErr(workResult.err)
+	if workResult.err != nil {
+		log.Printf("A problem occured when getting the sensorheaders: %+v", workResult.err)
+		return make([]mdl.Sensor, 0)
+	}
 	sensors := workResult.Result.([]mdl.Sensor)
 	return sensors
+}
+
+func isOffline() bool {
+	return instantiated == nil
 }
 
 func checkErr(err error) {
