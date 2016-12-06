@@ -6,6 +6,7 @@ type MessageUplinkI interface {
 	AddPayload(p []byte, s Sensor)
 	GetPayloads() []messagePayloadI
 	GetId() int64
+	GetDevEUI() string
 }
 
 type MessageUplink struct {
@@ -37,4 +38,8 @@ func (m *MessageUplink) GetPayloads() []messagePayloadI {
 
 func (m *MessageUplink) GetId() int64 {
 	return m.Id
+}
+
+func (m *MessageUplink) GetDevEUI() string {
+	return m.DevEUI
 }
