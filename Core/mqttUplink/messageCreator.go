@@ -16,6 +16,9 @@ type messageCreator struct {
 	messageConverter MessageConverter.MessageConverter
 }
 
+// A messageCreator is created, the purpose of the MessageCreator is to
+// convert the message, that comes in from a payload and the devEUI as bytes,
+// to the MessageUplinkI format for further use.
 func NewMessageCreator() MessageCreator {
 	mc := new(messageCreator)
 	mc.messageConverter = MessageConverter.New()

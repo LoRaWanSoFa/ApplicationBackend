@@ -13,14 +13,12 @@ var mc = NewMessageCreator()
 var message = mc.CreateMessage(payload, devEuiB)
 
 func TestAddSimpleMessage(t *testing.T) {
-
 	if message.GetDevEUI() != devEuiS {
 		t.Errorf("Expected %s, was %s with input %v", devEuiS, message.GetDevEUI(), devEuiB)
 	}
 }
 
 func TestCheckPayloads(t *testing.T) {
-
 	gpsSensor := components.NewSensor(3, 0, 0, 2, 4, 1, 2, "", "0")
 	boolSensor := components.NewSensor(4, 0, 0, 1, 1, 2, 5, "", "0")
 	expectedMessage := components.NewMessageUplink(123, devEuiS)
