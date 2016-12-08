@@ -5,8 +5,7 @@
 -- Dumped from database version 9.6.1
 -- Dumped by pg_dump version 9.6.1
 
--- Started on 2016-12-01 12:44:40
-
+-- Started on 2016-12-08 12:53:05
 
 CREATE DATABASE lorawan;
 \c lorawan
@@ -15,6 +14,7 @@ CREATE ROLE admin LOGIN
   SUPERUSER INHERIT CREATEDB CREATEROLE NOREPLICATION;
   
 CREATE USER docker WITH SUPERUSER PASSWORD 'docker';
+
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -27,7 +27,7 @@ SET row_security = off;
 
 --
 -- TOC entry 1 (class 3079 OID 12393)
--- Name: plpgsql; Type: EXTENSION; Schema: -; Owner:
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
 --
 
 CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
@@ -36,7 +36,7 @@ CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 --
 -- TOC entry 2217 (class 0 OID 0)
 -- Dependencies: 1
--- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner:
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
 --
 
 COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
@@ -359,6 +359,9 @@ GATE123	EUW123
 --
 
 COPY message_payloads (message_id, sensor_id, payload_order, payload) FROM stdin;
+76	1	1	p1                                                                                                                                                                                                                                                             
+76	1	2	p2                                                                                                                                                                                                                                                             
+76	2	3	p3                                                                                                                                                                                                                                                             
 \.
 
 
@@ -369,34 +372,79 @@ COPY message_payloads (message_id, sensor_id, payload_order, payload) FROM stdin
 --
 
 COPY messages (id, deveui, created_at, down) FROM stdin;
-1	A4C12BF	2016-11-17 00:00:00	t
-2	A4C12BF	2016-11-24 12:15:52.090433	f
-3	A4C12BF	2016-11-24 12:16:17.618165	f
-4	A4C12BF	2016-11-24 12:16:38.193585	f
-7	A4C12BF	2016-11-24 20:47:00.166488	f
-8	A4C12BF	2016-11-24 20:48:40.862602	f
-10	A4C12BF	2016-11-24 20:49:40.171542	f
-12	A4C12BF	2016-11-24 20:51:22.052245	f
-14	A4C12BF	2016-11-24 20:51:51.346991	f
-16	A4C12BF	2016-11-24 20:56:48.12764	f
-18	A4C12BF	2016-11-24 21:00:47.566878	f
-20	A4C12BF	2016-11-24 21:03:22.77461	f
-22	A4C12BF	2016-11-24 21:03:45.717692	f
-24	A4C12BF	2016-11-24 21:04:02.74158	f
-26	A4C12BF	2016-11-29 13:05:48.602461	f
-28	A4C12BF	2016-12-01 08:56:02.613455	f
-30	A4C12BF	2016-12-01 08:56:50.405866	f
-32	A4C12BF	2016-12-01 09:03:54.637014	f
-34	A4C12BF	2016-12-01 09:05:35.041351	f
-36	A4C12BF	2016-12-01 09:06:46.582832	f
-38	A4C12BF	2016-12-01 09:07:04.813297	f
-40	A4C12BF	2016-12-01 09:07:54.440649	f
-42	A4C12BF	2016-12-01 09:09:54.1336	f
-44	A4C12BF	2016-12-01 09:37:54.663616	f
-46	A4C12BF	2016-12-01 09:38:31.627896	f
-48	A4C12BF	2016-12-01 09:38:31.713778	f
-50	A4C12BF	2016-12-01 09:50:00.276057	f
-52	A4C12BF	2016-12-01 09:50:47.240952	f
+115	A4C12BF	2016-12-02 12:36:38.298558	f
+116	A4C12BF	2016-12-02 12:56:38.154857	f
+117	A4C12BF	2016-12-02 12:57:08.117854	f
+118	A4C12BF	2016-12-02 12:57:38.557752	f
+119	A4C12BF	2016-12-06 10:55:40.535019	f
+120	A4C12BF	2016-12-06 10:56:16.43603	f
+121	A4C12BF	2016-12-06 10:56:28.327102	f
+122	A4C12BF	2016-12-06 10:56:43.598245	f
+123	A4C12BF	2016-12-06 11:50:57.424101	f
+124	A4C12BF	2016-12-06 11:50:59.724856	f
+125	A4C12BF	2016-12-06 11:51:41.583033	f
+126	A4C12BF	2016-12-06 11:52:30.653562	f
+127	A4C12BF	2016-12-06 12:36:47.519213	f
+128	A4C12BF	2016-12-06 12:39:26.683418	f
+129	A4C12BF	2016-12-06 12:39:29.986743	f
+130	A4C12BF	2016-12-06 12:40:19.509091	f
+131	A4C12BF	2016-12-06 12:40:26.24116	f
+132	A4C12BF	2016-12-06 12:40:33.945643	f
+133	A4C12BF	2016-12-06 12:40:37.418786	f
+134	A4C12BF	2016-12-06 12:40:46.148126	f
+135	A4C12BF	2016-12-06 12:41:47.380918	f
+136	A4C12BF	2016-12-06 12:41:54.630515	f
+137	A4C12BF	2016-12-06 12:42:02.035045	f
+138	A4C12BF	2016-12-06 12:47:21.401807	f
+139	A4C12BF	2016-12-06 12:47:29.0956	f
+140	A4C12BF	2016-12-06 13:07:07.507141	f
+141	A4C12BF	2016-12-06 13:07:28.322412	f
+142	A4C12BF	2016-12-06 13:10:37.782576	f
+143	A4C12BF	2016-12-06 13:10:42.939163	f
+144	A4C12BF	2016-12-06 13:15:35.606047	f
+145	A4C12BF	2016-12-06 13:24:08.374788	f
+146	A4C12BF	2016-12-06 13:26:36.316284	f
+147	A4C12BF	2016-12-06 13:26:50.275587	f
+148	A4C12BF	2016-12-06 13:34:20.076432	f
+150	A4C12BF	2016-12-08 08:25:16.533052	f
+151	A4C12BF	2016-12-08 08:30:24.298231	f
+152	A4C12BF	2016-12-08 09:08:32.62949	f
+76	A4C12BF	2016-12-01 13:56:21.462866	f
+153	A4C12BF	2016-12-08 09:08:59.504495	f
+154	A4C12BF	2016-12-08 09:37:34.819011	f
+155	A4C12BF	2016-12-08 09:38:28.033172	f
+156	A4C12BF	2016-12-08 09:38:40.444844	f
+157	A4C12BF	2016-12-08 09:39:35.066355	f
+158	A4C12BF	2016-12-08 09:39:45.357558	f
+159	A4C12BF	2016-12-08 09:39:47.15094	f
+160	A4C12BF	2016-12-08 09:41:29.928009	f
+161	A4C12BF	2016-12-08 09:41:31.48498	f
+162	A4C12BF	2016-12-08 09:41:32.76606	f
+163	A4C12BF	2016-12-08 09:41:41.001162	f
+164	A4C12BF	2016-12-08 09:41:58.467691	f
+165	A4C12BF	2016-12-08 10:02:56.30854	f
+166	A4C12BF	2016-12-08 10:19:01.658509	f
+167	A4C12BF	2016-12-08 10:21:14.917733	f
+168	A4C12BF	2016-12-08 10:21:27.779988	f
+169	A4C12BF	2016-12-08 10:21:46.210119	f
+170	A4C12BF	2016-12-08 10:22:18.354839	f
+171	A4C12BF	2016-12-08 10:22:34.229935	f
+172	A4C12BF	2016-12-08 10:32:05.320805	f
+173	A4C12BF	2016-12-08 10:37:19.037818	f
+175	A4C12BF	2016-12-08 10:37:39.791364	f
+177	A4C12BF	2016-12-08 10:38:26.500802	f
+178	00000000ABCDEF12	2016-12-08 10:45:52.937038	f
+179	A4C12BF	2016-12-08 10:45:53.033343	f
+180	A4C12BF	2016-12-08 10:52:05.948179	f
+181	A4C12BF	2016-12-08 10:52:12.140259	f
+182	00000000ABCDEF12	2016-12-08 11:37:19.14501	f
+183	00000000ABCDEF12	2016-12-08 11:37:30.249535	f
+184	A4C12BF	2016-12-08 11:45:46.34836	f
+185	A4C12BF	2016-12-08 11:45:59.07122	f
+186	A4C12BF	2016-12-08 11:46:24.619158	f
+187	A4C12BF	2016-12-08 11:46:42.604792	f
+188	A4C12BF	2016-12-08 11:48:36.122436	f
+189	A4C12BF	2016-12-08 11:49:07.911551	f
 \.
 
 
@@ -406,7 +454,7 @@ COPY messages (id, deveui, created_at, down) FROM stdin;
 -- Name: messages_id_seq; Type: SEQUENCE SET; Schema: public; Owner: docker
 --
 
-SELECT pg_catalog.setval('messages_id_seq', 53, true);
+SELECT pg_catalog.setval('messages_id_seq', 189, true);
 
 
 --
@@ -439,6 +487,7 @@ COPY migrations (migration, batch) FROM stdin;
 
 COPY nodes (deveui, devaddr, appskey, nwkskey, operationtype, "interval", latitude, longitude) FROM stdin;
 A4C12BF	1345ABCD	70B426335	1325746823	A	5	23.456700	54.124200
+00000000ABCDEF12	ABCDEF12	70B426334	1325746822	C	6	40.730610	-73.935242
 \.
 
 
@@ -461,6 +510,8 @@ COPY password_resets (email, token, created_at) FROM stdin;
 COPY sensors (id, sensortype_id, deveui, io_type, io_address, number_of_values, lenght_of_values, header_order) FROM stdin;
 1	1	A4C12BF             	1	1	1	1	1
 2	2	A4C12BF             	1	2	2	2	2
+3	3	00000000ABCDEF12    	1	1	2	4	1
+4	4	00000000ABCDEF12    	1	2	1	1	2
 \.
 
 
@@ -482,6 +533,8 @@ SELECT pg_catalog.setval('sensors_id_seq', 1, false);
 COPY sensortypes (id, description, conversion_expression, data_type) FROM stdin;
 1	This type of sensor is responsible for making Sander happy.	420 is life	0
 2	TEMP	+33.8	0
+3	GPS	0	2
+4	BOOL	0	5
 \.
 
 
@@ -664,19 +717,9 @@ ALTER TABLE ONLY sensors
     ADD CONSTRAINT sensors_sensortype_id_foreign FOREIGN KEY (sensortype_id) REFERENCES sensortypes(id) ON DELETE CASCADE;
 
 
--- Completed on 2016-12-01 12:44:40
+-- Completed on 2016-12-08 12:53:05
 
 --
 -- PostgreSQL database dump complete
 --
-INSERT INTO nodes
-VALUES ('00000000ABCDEF12','ABCDEF12','70B426334','1325746822','C',6,40.730610,-73.935242);
-INSERT INTO sensortypes 
-VALUES(3,GPS,0,2);
-INSERT INTO sensortypes 
-VALUES(4,'BOOL',0,5);
-INSERT INTO SENSORS
-VALUES(3,3,'00000000ABCDEF12',1,1,2,4,1);
-INSERT INTO SENSORS
-VALUES(4,4,'00000000ABCDEF12',1,2,1,1,2);
 

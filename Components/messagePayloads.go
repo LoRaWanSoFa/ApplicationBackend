@@ -7,6 +7,7 @@ type messagePayloadI interface {
 	SetPayload(data interface{})
 	GetSensor() Sensor
 	SetSensor(s Sensor)
+	Equals(mpi messagePayloadI) bool
 }
 
 type messagePayloadByte struct {
@@ -52,6 +53,31 @@ func (mpb *messagePayloadByte) SetSensor(s Sensor) {
 	mpb.Sensor = s
 }
 
+func (mpb *messagePayloadByte) Equals(mpi messagePayloadI) bool {
+	if mpb.Id != mpi.GetId() {
+		return false
+	}
+	otherPayload, ok := mpi.GetPayload().([]byte)
+	if ok {
+		if len(mpb.Payload) == len(otherPayload) {
+			for i := range mpb.Payload {
+				if mpb.Payload[i] != otherPayload[i] {
+					return false
+				}
+			}
+		} else {
+			return false
+		}
+	} else {
+		return false
+	}
+	if mpb.Sensor != mpi.GetSensor() {
+		return false
+	}
+
+	return true
+}
+
 //messagePayloadString
 
 func (mps *messagePayloadString) GetId() int64 {
@@ -81,4 +107,22 @@ func (mps *messagePayloadString) GetSensor() Sensor {
 
 func (mps *messagePayloadString) SetSensor(s Sensor) {
 	mps.Sensor = s
+}
+
+func (mps *messagePayloadString) Equals(mpi messagePayloadI) bool {
+	if mps.Id != mpi.GetId() {
+		return false
+	}
+	otherPayload, ok := mpi.GetPayload().(string)
+	if ok {
+		if mps.Payload != otherPayload {
+			return false
+		}
+	} else {
+		return false
+	}
+	if mps.Sensor != mpi.GetSensor() {
+		return false
+	}
+	return true
 }

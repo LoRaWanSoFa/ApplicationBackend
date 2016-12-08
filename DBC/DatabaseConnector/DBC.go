@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"sync"
+	"time"
 
 	mdl "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
 	_ "github.com/lib/pq"
@@ -59,11 +60,13 @@ func GetInstance() *DatabaseConnector {
 }
 
 func Connect() error {
+	//IDEA move sql.Open to here so we can reconnect.
 	db := GetInstance()
 	err := db.Database.Ping()
 	if err != nil {
 		return err
 	}
+	time.Sleep(1000 * time.Millisecond) //Wait for connections to finnish setting up. 1 sec is propably too long, can be finetuned later
 	db.CheckDevEUISTMT, err = db.Database.Prepare("select exists(select 1 from nodes where deveui=$1)")
 	if err != nil {
 		return err
@@ -173,18 +176,47 @@ func StoreMessagePayloads(message mdl.MessageUplinkI) error {
 		return errors.New("Nothing to store!")
 	}
 	var parameters []interface{}
+	var err error
 	for _, payload := range payloads {
-		parameters = append(parameters, message.GetId())        //message id
-		parameters = append(parameters, payload.GetSensor().Id) //sensor id
-		parameters = append(parameters, payload.GetPayload())   //payload
-		log.Printf("parameters: %+v", parameters)
+		parameters = make([]interface{}, 0)
+		parameters = append(parameters, message.GetId())               //message id
+		parameters = append(parameters, payload.GetSensor().Id)        //sensor id
+		parameters = append(parameters, payload.GetPayload().(string)) //payload
+		//log.Printf("parameters: %+v", parameters)
+		err = insertPayload(parameters)
+	}
+	if err != nil {
+		return nil
 	}
 	return nil
 }
 
-func getIndex(i int) string {
-	i++
-	return string(i)
+func insertPayload(parameters []interface{}) error {
+	result := make(chan WorkResult)
+	defer close(result)
+	WorkQueue <- WorkRequest{Query: "", Arguments: parameters, ResultChannel: result, F: func(w *WorkRequest) {
+		rows, err := GetInstance().InsertPayloadSTMT.Query(w.Arguments...)
+
+		checkErr(err)
+		if err != nil {
+			log.Println("Query could not be executed!")
+			w.ResultChannel <- WorkResult{Result: nil, err: err}
+			return
+		}
+		defer rows.Close()
+
+		rows.Next()
+		if err != nil {
+			w.ResultChannel <- WorkResult{Result: nil, err: err}
+		}
+		w.ResultChannel <- WorkResult{Result: true, err: nil}
+	}}
+	response := <-result
+	if response.err != nil {
+		log.Println("The worker could not execute the work properly")
+		return response.err
+	}
+	return nil
 }
 
 //Get messages from one node
