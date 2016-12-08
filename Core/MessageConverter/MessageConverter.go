@@ -125,11 +125,11 @@ func convertFloat(payload []byte) (string, error) {
 	case 4: //float32
 		var float float32
 		err = binary.Read(buf, binary.BigEndian, &float)
-		return fmt.Sprintf("%E", float), err
+		return fmt.Sprintf("%f", float), err
 	case 8: //float64
 		var float float64
 		err = binary.Read(buf, binary.BigEndian, &float)
-		return fmt.Sprintf("%E", float), err
+		return fmt.Sprintf("%f", float), err
 	default:
 		err = errors.New("illegal length of payload for a float type")
 		return "", err

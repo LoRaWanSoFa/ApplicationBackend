@@ -87,10 +87,10 @@ func TestFloatTypes(t *testing.T) {
 		expectedResult string // expectedResult
 		payload        []byte // input
 	}{
-		{"-5.528029E-18", validByteArrays[5]},
-		{"1.144374E-28", validByteArrays[6]},
-		{"5.626349E-221", validByteArrays[7]},
-		{"4.785832E-24", validByteArrays[8]},
+		{"19.287001", []byte{0x41, 0x9A, 0x4B, 0xC7}},
+		{"12.345670", []byte{0x41, 0x45, 0x87, 0xdd}},
+		{"918.273645", []byte{0x40, 0x8C, 0xB2, 0x30, 0x6C, 0xCA, 0x2D, 0xB6}},
+		{"-918.273645", []byte{0xC0, 0x8C, 0xB2, 0x30, 0x6C, 0xCA, 0x2D, 0xB6}},
 	}
 	messageConverter := New()
 	for _, item := range testData {
