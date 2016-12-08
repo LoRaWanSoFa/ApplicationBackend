@@ -1,6 +1,7 @@
 package mqttUplink
 
 import (
+	"fmt"
 	"log"
 
 	components "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
@@ -36,10 +37,12 @@ func (m *messageCreator) CreateMessage(payload []byte, devEui []byte) components
 	// Database entry creation.
 	err = DBC.Connect()
 	if err != nil {
+		fmt.Println("could not connect to database")
 		log.Fatal(err)
 	} else {
 		message, err = DBC.AddMessage(devEuiS)
 		sensors = DBC.GetNodeSensors(devEuiS)
+		fmt.Printf("found sensors %+v", sensors)
 		err = DBC.Close()
 		if err != nil {
 			log.Fatal(err)
