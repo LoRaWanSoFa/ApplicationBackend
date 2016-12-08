@@ -1,29 +1,30 @@
 package webserver
 
 import "fmt"
+import components "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
 
 var currentId int
 
-var messages Messages
+var messages components.Messages
 
 // Give us some seed data
 func init() {
-	RepoCreateMessage(Message{Id: 1})
-	RepoCreateMessage(Message{Id: 2})
-	RepoCreateMessage(Message{Id: 3})
+	RepoCreateMessage(components.MessageDownLink{Id: 1})
+	RepoCreateMessage(components.MessageDownLink{Id: 2})
+	RepoCreateMessage(components.MessageDownLink{Id: 3})
 }
 
-func RepoFindMessage(id int) Message {
+func RepoFindMessage(id int) components.MessageDownLink {
 	for _, t := range messages {
 		if t.Id == id {
 			return t
 		}
 	}
 	// return empty Todo if not found
-	return Message{}
+	return components.MessageDownLink{}
 }
 
-func RepoCreateMessage(t Message) Message {
+func RepoCreateMessage(t components.MessageDownLink) components.MessageDownLink {
 	currentId += 1
 	t.Id = currentId
 	messages = append(messages, t)
