@@ -1,5 +1,7 @@
 package components
 
+import "time"
+
 type MessageUplinkI interface {
 	AddPayload(p []byte, s Sensor)
 	GetPayloads() []messagePayloadI
@@ -15,6 +17,15 @@ type MessageUplink struct {
 	DevEUI   string // or [8]byte or types.DevEUI
 	Payloads []messagePayloadI
 }
+
+type MessageDownLink struct {
+	Id      int       `json:"id"`
+	Deveui  string    `json:"deveui"`
+	Payload string    `json:"payload"`
+	Time    time.Time `json:"time"`
+}
+
+type Messages []MessageDownLink
 
 func NewMessageUplink(id int64, devEUI string) MessageUplinkI {
 	message := new(MessageUplink)
