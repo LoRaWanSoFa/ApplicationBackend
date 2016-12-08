@@ -4,6 +4,7 @@ import (
 	"errors"
 	"testing"
 
+	mdl "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
 	_ "github.com/lib/pq"
 )
 
@@ -61,6 +62,38 @@ func TestGetNodeSensors(t *testing.T) {
 	sensors = GetNodeSensors("A4C12BF")
 	if len(sensors) <= 0 {
 		t.Errorf("Node \"\" has no sensors?: %+v", sensors)
+	}
+}
+
+func TestStoreMessagePayloads(t *testing.T) {
+	var err error
+	var m mdl.MessageUplinkI
+	err = StoreMessagePayloads(nil)
+	if err.Error() != "nil given as message parameter" {
+		t.Errorf("Did not catch nil exception")
+	}
+	m = new(mdl.MessageUplink)
+	err = StoreMessagePayloads(m)
+	if err.Error() != "Message has not been initalized/stored" {
+		t.Errorf("Message was used while not being initalized or stored")
+	}
+	m = mdl.NewMessageUplink(74, "A4C12BF")
+	err = StoreMessagePayloads(m)
+	if err.Error() != "Nothing to store!" {
+		t.Errorf("Message was used while not having any payload!")
+	}
+
+	sensors := GetNodeSensors("A4C12BF")
+	m, err = AddMessage("A4C12BF")
+	if err != nil {
+		t.Errorf("Could not add message for node A4C12BF. error: %+v", err)
+	}
+	m.RemovePayloads()
+	m.AddPayloadString("Howdee1", sensors[0])
+	m.AddPayloadString("Howdee2", sensors[1])
+	err = StoreMessagePayloads(m)
+	if err != nil {
+		t.Errorf("Could not insert payloads for node A4C12BF. error: %+v", err)
 	}
 }
 
