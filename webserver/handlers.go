@@ -51,7 +51,7 @@ func MessageShow(w http.ResponseWriter, r *http.Request) {
 
 /*
 Test with this curl command:
-curl -H "Content-Type: application/json" -d '{"name":"New Todo"}' http://localhost:8080/todos
+curl -H "Content-Type: application/json" -d '{"id":4, "deveui":"AFC147", "down":false}' http://localhost:8080/messages
 */
 func MessageCreate(w http.ResponseWriter, r *http.Request) {
 	var message Message
