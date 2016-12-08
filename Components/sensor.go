@@ -12,6 +12,7 @@ type Sensor struct {
 	DataType              int    // or int or string, or anything that shows what type of data this sensor is returning
 }
 
+// Headersensor will return a sensor object with default values for fields that are not needed durring proccesing
 func NewHeaderSensor(
 	id int64,
 	number_of_values,
@@ -23,6 +24,7 @@ func NewHeaderSensor(
 	return Sensor{id, 0, 0, number_of_values, lenght_of_values, header_order, "", conversion_expression, data_type}
 }
 
+//Default constructor
 func NewSensor(
 	id,
 	ioType int64,
@@ -33,6 +35,5 @@ func NewSensor(
 	data_type int,
 	description,
 	conversion_expression string) Sensor {
-	//return sensor(id:id, IoType:io_type)
 	return Sensor{id, ioType, ioAddress, number_of_values, lenght_of_values, header_order, description, conversion_expression, data_type}
 }
