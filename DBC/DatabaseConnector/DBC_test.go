@@ -75,12 +75,12 @@ func TestStoreMessagePayloads(t *testing.T) {
 	m = new(mdl.MessageUplink)
 	err = StoreMessagePayloads(m)
 	if err.Error() != "Message has not been initalized/stored" {
-		t.Errorf("Message was used while not being initalized or stored")
+		t.Errorf("Works without an message id")
 	}
-	m = mdl.NewMessageUplink(74, "A4C12BF")
+	m = mdl.NewMessageUplink(33, "A4C12BF")
 	err = StoreMessagePayloads(m)
 	if err.Error() != "Nothing to store!" {
-		t.Errorf("Message was used while not having any payload!")
+		t.Errorf("Works without payloads")
 	}
 
 	sensors := GetNodeSensors("A4C12BF")
