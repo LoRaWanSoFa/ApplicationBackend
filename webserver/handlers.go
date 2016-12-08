@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strconv"
 
+	dist "github.com/LoRaWanSoFa/LoRaWanSoFa/Core/distributor"
 	"github.com/gorilla/mux"
 )
 
@@ -51,7 +52,7 @@ func MessageShow(w http.ResponseWriter, r *http.Request) {
 
 /*
 Test with this curl command:
-curl -H "Content-Type: application/json" -d '{"id":4, "deveui":"AFC147", "down":false}' http://localhost:8080/messages
+curl -H "Content-Type: application/json" -d '{"deveui":"AFC147", "payload":"DESG6184FHAS"}' http://localhost:8080/messages
 */
 func MessageCreate(w http.ResponseWriter, r *http.Request) {
 	var message Message
@@ -73,6 +74,7 @@ func MessageCreate(w http.ResponseWriter, r *http.Request) {
 	t := RepoCreateMessage(message)
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusCreated)
+	dist.New().InputDownlink(message)
 	if err := json.NewEncoder(w).Encode(t); err != nil {
 		panic(err)
 	}
