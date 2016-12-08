@@ -1,7 +1,6 @@
 package mqttUplink
 
 import (
-	"fmt"
 	"log"
 
 	components "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
@@ -46,23 +45,18 @@ func (m *messageCreator) CreateMessage(payload []byte, devEui []byte) components
 			log.Fatal(err)
 		}
 	}
-
+	// adding payloads to the newly created message
 	m.addPayloads(payload, &message, sensors)
-
 	return message
 }
 
 func (m *messageCreator) addPayloads(payload []byte, message *components.MessageUplinkI, sensors []components.Sensor) {
-
-	fmt.Println("enter add Payloads")
 	for i := range sensors {
 		LoV := sensors[i].LenghtOfValues
 		NoV := sensors[i].NumberOfValues
 		for j := 0; j < NoV; j++ {
 			(*message).AddPayload(payload[:LoV], sensors[i])
-			fmt.Println(payload)
 			payload = payload[LoV:]
-			fmt.Println((*message).GetPayloads())
 		}
 	}
 }
