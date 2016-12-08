@@ -4,7 +4,7 @@ import "time"
 
 type Message struct {
 	Id     int       `json:"id"`
-	Deveui int       `json:"deveui"`
+	Deveui string    `json:"deveui"`
 	Down   bool      `json:"down"`
 	Time   time.Time `json:"time"`
 }
