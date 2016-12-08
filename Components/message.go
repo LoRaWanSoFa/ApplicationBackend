@@ -19,7 +19,7 @@ type MessageUplink struct {
 }
 
 type MessageDownLink struct {
-	Id      int       `json:"id"`
+	Id      int64     `json:"id"`
 	Deveui  string    `json:"deveui"`
 	Payload string    `json:"payload"`
 	Time    time.Time `json:"time"`

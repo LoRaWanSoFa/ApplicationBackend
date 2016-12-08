@@ -32,7 +32,7 @@ func MessageShow(w http.ResponseWriter, r *http.Request) {
 	if messageId, err = strconv.Atoi(vars["messageId"]); err != nil {
 		panic(err)
 	}
-	message := RepoFindMessage(messageId)
+	message := RepoFindMessage(int64(messageId))
 	if message.Id > 0 {
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.WriteHeader(http.StatusOK)

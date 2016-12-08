@@ -3,7 +3,7 @@ package webserver
 import "fmt"
 import components "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
 
-var currentId int
+var currentId int64
 
 var messages components.Messages
 
@@ -14,7 +14,7 @@ func init() {
 	RepoCreateMessage(components.MessageDownLink{Id: 3})
 }
 
-func RepoFindMessage(id int) components.MessageDownLink {
+func RepoFindMessage(id int64) components.MessageDownLink {
 	for _, t := range messages {
 		if t.Id == id {
 			return t
@@ -31,7 +31,7 @@ func RepoCreateMessage(t components.MessageDownLink) components.MessageDownLink 
 	return t
 }
 
-func RepoDestroyMessage(id int) error {
+func RepoDestroyMessage(id int64) error {
 	for i, t := range messages {
 		if t.Id == id {
 			messages = append(messages[:i], messages[i+1:]...)
