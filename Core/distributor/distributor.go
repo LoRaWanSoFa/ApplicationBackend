@@ -1,11 +1,10 @@
 package distributor
 
 import components "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
-import webserver "github.com/LoRaWanSoFa/LoRaWanSoFa/webserver"
 
 type Distributor interface {
 	InputUplink()
-	InputDownlink(webserver.Message)
+	InputDownlink(components.MessageDownLink)
 }
 
 type distributor struct {
@@ -19,7 +18,7 @@ func New() Distributor {
 func (d *distributor) InputUplink() {
 
 }
-func (d *distributor) InputDownlink(message webserver.Message) {
+func (d *distributor) InputDownlink(message components.MessageDownLink) {
 
 }
 
