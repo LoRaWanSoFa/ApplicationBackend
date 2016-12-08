@@ -18,7 +18,8 @@ func TestConvertMessage(t *testing.T) {
 	expectedMessage.AddPayloadString("40.730610", gpsSensor)
 	expectedMessage.AddPayloadString("-73.935242", gpsSensor)
 
-	payloads := dist.InputUplink(inputMessage).GetPayloads()
+	mp, _ := dist.InputUplink(inputMessage)
+	payloads := mp.GetPayloads()
 	for i := range payloads {
 		inputPayload := payloads[i]
 		expectedPayload := expectedMessage.GetPayloads()[i]

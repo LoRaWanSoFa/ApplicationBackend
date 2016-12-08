@@ -1,14 +1,16 @@
 package distributor
 
 import (
+	"errors"
 	"log"
 
 	components "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
 	"github.com/LoRaWanSoFa/LoRaWanSoFa/Core/MessageConverter"
+	DBC "github.com/LoRaWanSoFa/LoRaWanSoFa/DBC/DatabaseConnector"
 )
 
 type Distributor interface {
-	InputUplink(components.MessageUplinkI) components.MessageUplinkI
+	InputUplink(components.MessageUplinkI) (components.MessageUplinkI, error)
 	InputDownlink(components.MessageDownLink)
 }
 
@@ -22,8 +24,17 @@ func New() Distributor {
 	return dist
 }
 
-func (d *distributor) InputUplink(message components.MessageUplinkI) components.MessageUplinkI {
-	return d.convertMessage(message)
+func (d *distributor) InputUplink(message components.MessageUplinkI) (components.MessageUplinkI, error) {
+	if d.deduplicate(message) {
+		newMessage := d.convertMessage(message)
+		DBC.Connect()
+		DBC.StoreMessagePayloads(newMessage)
+		DBC.Close()
+		return newMessage, nil
+	} else {
+		err := errors.New("message was a duplicate")
+		return nil, err
+	}
 }
 func (d *distributor) InputDownlink(message components.MessageDownLink) {
 
