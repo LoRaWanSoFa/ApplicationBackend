@@ -219,11 +219,6 @@ func insertPayload(parameters []interface{}) error {
 	return nil
 }
 
-func getIndex(i int) string {
-	i++
-	return string(i)
-}
-
 //Get messages from one node
 // TODO define return type
 func GetNodeMessages(NodeId, maxMessages int) {
