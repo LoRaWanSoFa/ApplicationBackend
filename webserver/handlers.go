@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strconv"
 
+	components "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
 	dist "github.com/LoRaWanSoFa/LoRaWanSoFa/Core/distributor"
 	"github.com/gorilla/mux"
 )
@@ -55,7 +56,7 @@ Test with this curl command:
 curl -H "Content-Type: application/json" -d '{"deveui":"AFC147", "payload":"DESG6184FHAS"}' http://localhost:8080/messages
 */
 func MessageCreate(w http.ResponseWriter, r *http.Request) {
-	var message Message
+	var message components.MessageDownLink
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 	if err != nil {
 		panic(err)
