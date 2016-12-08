@@ -34,5 +34,19 @@ func TestAddPayload(t *testing.T) {
 	if string(payloads[0].GetPayload().([]byte)) != "test" {
 		t.Errorf("Expected %+v, was %+v", "test", string(payloads[0].GetPayload().([]byte)))
 	}
+}
 
+func TestAddPayloadString(t *testing.T) {
+	m := NewMessageUplink(23, "devEUI")
+	s := NewHeaderSensor(77, 1, 2, 1, 1, "+1")
+	m.AddPayload([]byte("test"), s)
+	m.RemovePayloads()
+	m.AddPayloadString("TestString", s)
+	payloads := m.GetPayloads()
+	if len(payloads) != 1 {
+		t.Errorf("Expected %+v, was lenght %+v", "lenght 1", len(payloads))
+	}
+	if payloads[0].GetPayload() != "TestString" {
+		t.Errorf("Expected %+v, was %+v", "test", string(payloads[0].GetPayload().([]byte)))
+	}
 }
