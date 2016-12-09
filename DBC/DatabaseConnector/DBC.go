@@ -13,11 +13,12 @@ import (
 )
 
 type DatabaseConnector struct {
-	Database          *sql.DB
-	CheckDevEUISTMT   *sql.Stmt
-	GetNodeHeaderSTMT *sql.Stmt
-	InsertMessageSTMT *sql.Stmt
-	InsertPayloadSTMT *sql.Stmt
+	Database                  *sql.DB
+	CheckDevEUISTMT           *sql.Stmt
+	GetNodeHeaderSTMT         *sql.Stmt
+	InsertMessageSTMT         *sql.Stmt
+	InsertPayloadSTMT         *sql.Stmt
+	InsertDownlinkMessageSTMT *sql.Stmt
 }
 
 type WorkRequest struct {
@@ -82,6 +83,13 @@ func Connect() error {
 	db.InsertMessageSTMT, err = db.Database.Prepare("INSERT INTO public.messages(" +
 		"deveui, created_at, down) " +
 		"VALUES ($1, NOW(), false) " +
+		"RETURNING id;")
+	if err != nil {
+		return err
+	}
+	db.InsertDownlinkMessageSTMT, err = db.Database.Prepare("INSERT INTO public.messages(" +
+		"deveui, created_at, down) " +
+		"VALUES ($1, $2, true) " +
 		"RETURNING id;")
 	if err != nil {
 		return err
@@ -219,10 +227,72 @@ func insertPayload(parameters []interface{}) error {
 	return nil
 }
 
-//Get messages from one node
-// TODO define return type
-func GetNodeMessages(NodeId, maxMessages int) {
-	// TODO
+//Stores a DownlinkMessage which has an id,payload and deveui set.
+//if no time is set NOW() will be used
+func StoreDownlinkMessage(message *mdl.MessageDownLink) error {
+	if message.Id != 0 {
+		return errors.New("Message already has an id, can not insert it")
+	}
+	if message.Payload == "" {
+		return errors.New("Message has an empty payload")
+	}
+	if message.Deveui == "" {
+		return errors.New("Message has no DevEUI set")
+	}
+	if message.Time.IsZero() {
+		message.Time = time.Now()
+	}
+	err := addDownlinkMessage(message)
+	if err != nil {
+		return err
+	}
+	var parameters []interface{}
+	parameters = append(parameters, message.Id)
+	parameters = append(parameters, nil)
+	parameters = append(parameters, message.Payload)
+	err = insertPayload(parameters)
+	return err
+}
+
+// Executes the query to insert the message
+// Formats the time to UTC and rounds it to second percision.
+// Sets a new id for the message
+func addDownlinkMessage(message *mdl.MessageDownLink) error {
+	//create response channel
+	result := make(chan WorkResult)
+	defer close(result)
+	//create arguments
+	args := make([]interface{}, 2)
+	args[0] = message.Deveui
+	args[1] = message.Time.UTC().Round(time.Second).Format(time.RFC3339)
+	//create and add new WorkRequest
+	WorkQueue <- WorkRequest{Query: "", Arguments: args, ResultChannel: result, F: func(w *WorkRequest) {
+		var messageId int64
+		rows, err := GetInstance().InsertDownlinkMessageSTMT.Query(w.Arguments...)
+
+		checkErr(err)
+		if err != nil {
+			log.Println("Query could not be executed")
+			w.ResultChannel <- WorkResult{Result: 0, err: err}
+			return
+		}
+		defer rows.Close()
+
+		rows.Next()
+		err = rows.Scan(&messageId)
+		if err != nil {
+			w.ResultChannel <- WorkResult{Result: 0, err: err}
+		}
+		w.ResultChannel <- WorkResult{Result: messageId, err: nil}
+	}}
+	response := <-result
+	if response.err != nil {
+		log.Println("Worker could finnish its work properly")
+		return response.err
+	}
+	message.Id = response.Result.(int64)
+
+	return response.err
 }
 
 //Get sensors that belong to one node
