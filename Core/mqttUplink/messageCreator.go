@@ -47,7 +47,7 @@ func (m *messageCreator) CreateMessage(payload []byte, devEui []byte) (component
 		return nil, err
 	}
 	// adding payloads to the newly created message
-	m.addPayloads(payload, &message, sensors)
+	m.addPayloads(payload[1:], &message, sensors)
 	return message, nil
 }
 

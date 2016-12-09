@@ -1,7 +1,6 @@
 package mqttUplink
 
 import (
-	"fmt"
 	"os"
 	"testing"
 
@@ -11,7 +10,7 @@ import (
 
 var devEuiB = []byte{0x00, 0x00, 0x00, 0x00, 0xAB, 0xCD, 0xEF, 0x12}
 var devEuiS = "00000000ABCDEF12"
-var payload = []byte{0x42, 0x22, 0xEC, 0x25, 0xC2, 0x93, 0xDE, 0xD8, 0x01}
+var payload = []byte{0x10, 0x42, 0x22, 0xEC, 0x25, 0xC2, 0x93, 0xDE, 0xD8, 0x01}
 var message components.MessageUplinkI
 var mc = NewMessageCreator()
 
@@ -50,9 +49,7 @@ func TestCheckPayloads(t *testing.T) {
 
 func TestNoHeader(t *testing.T) {
 	devEuiNoSensor := []byte{0x00, 0x00, 0x00, 0x00, 0xAF, 0x12, 0x94, 0xE5}
-	fmt.Println("am here")
 	_, err := mc.CreateMessage(payload, devEuiNoSensor)
-	fmt.Println(err)
 	if err == nil {
 		t.Errorf("The node should not have a header, and throw an error %+v", err)
 	}
