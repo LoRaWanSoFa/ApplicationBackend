@@ -2,7 +2,6 @@ package distributor
 
 import (
 	"errors"
-	"fmt"
 	"log"
 
 	components "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
@@ -25,7 +24,6 @@ func New() Distributor {
 	dist := new(distributor)
 	dist.messageConverter = MessageConverter.New()
 	config := components.GetConfiguration().Rest
-	fmt.Println(config)
 	dist.restUplinkConnector = restUplink.NewRestUplinkConnector(config.Ip, config.ApiKey)
 	return dist
 }
