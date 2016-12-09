@@ -2,6 +2,7 @@ package distributor
 
 import (
 	"errors"
+	"fmt"
 	"log"
 
 	components "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
@@ -23,18 +24,26 @@ type distributor struct {
 func New() Distributor {
 	dist := new(distributor)
 	dist.messageConverter = MessageConverter.New()
-	config := components.GetConfiguration()
-
-	restUplink.NewRestUplinkConnector(config.Rest.Ip, config.Rest.ApiKey)
+	config := components.GetConfiguration().Rest
+	fmt.Println(config)
+	dist.restUplinkConnector = restUplink.NewRestUplinkConnector(config.Ip, config.ApiKey)
 	return dist
 }
 
 func (d *distributor) InputUplink(message components.MessageUplinkI) (components.MessageUplinkI, error) {
 	if d.deduplicate(message) {
 		newMessage := d.convertMessage(message)
-		DBC.Connect()
-		DBC.StoreMessagePayloads(newMessage)
-		DBC.Close()
+		err := DBC.Connect()
+		if err == nil {
+			err = DBC.StoreMessagePayloads(newMessage)
+			DBC.Close()
+			if err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			log.Fatal(err)
+		}
+
 		d.restUplinkConnector.NewData(newMessage.GetDevEUI(), newMessage)
 		return newMessage, nil
 	} else {
