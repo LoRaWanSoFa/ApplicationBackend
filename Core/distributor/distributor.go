@@ -8,7 +8,7 @@ import (
 	components "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
 	"github.com/LoRaWanSoFa/LoRaWanSoFa/Core/MessageConverter"
 	"github.com/LoRaWanSoFa/LoRaWanSoFa/Core/restUplinkConnector"
-	DBC "github.com/LoRaWanSoFa/LoRaWanSoFa/DBC/DatabaseConnector"
+	"github.com/LoRaWanSoFa/LoRaWanSoFa/DBC/DatabaseConnector"
 )
 
 type Distributor interface {
@@ -33,17 +33,10 @@ func New() Distributor {
 func (d *distributor) InputUplink(message components.MessageUplinkI) (components.MessageUplinkI, error) {
 	if d.deduplicate(message) {
 		newMessage := d.convertMessage(message)
-		err := DBC.Connect()
-		if err == nil {
-			err = DBC.StoreMessagePayloads(newMessage)
-			DBC.Close()
-			if err != nil {
-				log.Fatal(err)
-			}
-		} else {
+		err := DatabaseConnector.StoreMessagePayloads(newMessage)
+		if err != nil {
 			log.Fatal(err)
 		}
-
 		d.restUplinkConnector.NewData(newMessage.GetDevEUI(), newMessage)
 		return newMessage, nil
 	} else {
