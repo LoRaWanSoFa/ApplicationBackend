@@ -10,7 +10,7 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-type DatabaseData struct {
+type Configuration struct {
 	Mqtt struct {
 		AppEUI   string `yaml:"AppEUI"`
 		Password string `yaml:"Password"`
@@ -31,37 +31,27 @@ type DatabaseData struct {
 }
 
 var once sync.Once
-var settings DatabaseData
+var settings Configuration
 
-func GetConfiguration() DatabaseData {
+func GetConfiguration() Configuration {
 	once.Do(func() {
-		// START: yaml config block
-		goPath := os.Getenv("GOPATH")
-		yamlFile, err := ioutil.ReadFile(filepath.Join(goPath, "/src/github.com/LoRaWanSoFa/LoRaWanSoFa/config.yaml"))
-		if err != nil {
-			return
-		}
-		settings = DatabaseData{}
-		err = yaml.Unmarshal(yamlFile, &settings)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		// END: yaml config block
+		settings = ReloadConfig()
 	})
 	return settings
 }
 
-func ReloadConfig() DatabaseData {
+func ReloadConfig() Configuration {
+	// START: yaml config block
 	goPath := os.Getenv("GOPATH")
 	yamlFile, err := ioutil.ReadFile(filepath.Join(goPath, "/src/github.com/LoRaWanSoFa/LoRaWanSoFa/config.yaml"))
 	if err != nil {
 		return settings
 	}
-	settings = DatabaseData{}
+	settings = Configuration{}
 	err = yaml.Unmarshal(yamlFile, &settings)
 	if err != nil {
 		fmt.Println(err)
 	}
+	// END: yaml config block
 	return settings
 }
