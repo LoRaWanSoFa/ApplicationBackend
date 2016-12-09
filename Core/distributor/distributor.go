@@ -6,6 +6,7 @@ import (
 
 	components "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
 	"github.com/LoRaWanSoFa/LoRaWanSoFa/Core/MessageConverter"
+	"github.com/LoRaWanSoFa/LoRaWanSoFa/Core/restUplinkConnector"
 	DBC "github.com/LoRaWanSoFa/LoRaWanSoFa/DBC/DatabaseConnector"
 )
 
@@ -15,12 +16,16 @@ type Distributor interface {
 }
 
 type distributor struct {
-	messageConverter MessageConverter.MessageConverter
+	messageConverter    MessageConverter.MessageConverter
+	restUplinkConnector restUplink.RestUplinkConnector
 }
 
 func New() Distributor {
 	dist := new(distributor)
 	dist.messageConverter = MessageConverter.New()
+	config := components.GetConfiguration()
+
+	restUplink.NewRestUplinkConnector(config.Rest.Ip, config.Rest.ApiKey)
 	return dist
 }
 
@@ -30,12 +35,14 @@ func (d *distributor) InputUplink(message components.MessageUplinkI) (components
 		DBC.Connect()
 		DBC.StoreMessagePayloads(newMessage)
 		DBC.Close()
+		d.restUplinkConnector.NewData(newMessage.GetDevEUI(), newMessage)
 		return newMessage, nil
 	} else {
 		err := errors.New("message was a duplicate")
 		return nil, err
 	}
 }
+
 func (d *distributor) InputDownlink(message components.MessageDownLink) {
 
 }
