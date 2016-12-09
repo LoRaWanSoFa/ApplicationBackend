@@ -24,6 +24,10 @@ type DatabaseData struct {
 		Port            int    `yaml:"Port"`
 		NumberOfWorkers int    `yaml:"NumberOfWorkers"`
 	}
+	Rest struct {
+		Ip     string `yaml:"Ip"`
+		ApiKey string `yaml:"ApiKey"`
+	}
 }
 
 var once sync.Once
