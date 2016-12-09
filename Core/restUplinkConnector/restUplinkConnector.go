@@ -3,7 +3,8 @@ package restUplink
 import (
 	"fmt"
 	"net/http"
-	"net/url"
+
+	components "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
 )
 
 type RestUplinkConnector interface {
@@ -12,7 +13,7 @@ type RestUplinkConnector interface {
 	DeleteNode(nodeId string) (*http.Response, error)
 	NewSensor(nodeId string, sensorId string) (*http.Response, error)
 	DeleteSensor(nodeId string, sensorId string) (*http.Response, error)
-	NewData(nodeId string, message url.Values) (*http.Response, error)
+	NewData(nodeId string, message components.MessageUplinkI) (*http.Response, error)
 }
 
 type restUplinkConnector struct {
@@ -81,13 +82,13 @@ func (r *restUplinkConnector) DeleteSensor(nodeId string, sensorId string) (*htt
 	// isn't nodeId needed as well as sensorId
 }
 
-func (r *restUplinkConnector) NewData(nodeId string, message url.Values) (*http.Response, error) {
+func (r *restUplinkConnector) NewData(nodeId string, message components.MessageUplinkI) (*http.Response, error) {
 	//Post Request:
 	//http://ip/api/{apikey}/newdata
 	//Needs to be called if data from a node comes in.
 	// add json to it
 	url := fmt.Sprintf("%s/newData/%s", r.basicURL, nodeId)
-	resp, err := http.PostForm(url, message)
+	resp, err := http.PostForm(url, message.ToJson())
 	// isn't nodeId needed here?
 	return resp, err
 }
