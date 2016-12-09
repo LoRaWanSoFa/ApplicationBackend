@@ -97,6 +97,38 @@ func TestStoreMessagePayloads(t *testing.T) {
 	}
 }
 
+func TestStoreDownlinkMessage(t *testing.T) {
+	dm := new(mdl.MessageDownLink)
+
+	dm.Id = 1
+	dmerror := StoreDownlinkMessage(dm)
+	if dmerror.Error() != "Message already has an id, can not insert it" {
+		t.Errorf("Allowed an already proccesed message to be stored again; %+v", dmerror)
+	}
+	dm.Id = 0
+	dmerror = StoreDownlinkMessage(dm)
+	if dmerror.Error() != "Message has an empty payload" {
+		t.Errorf("Allowed a message to be stored without a payload; %+v", dmerror)
+	}
+	dm.Payload = "DOWNLINKMESSAGE"
+	dmerror = StoreDownlinkMessage(dm)
+	if dmerror.Error() != "Message has no DevEUI set" {
+		t.Errorf("Allowed a message to be stored without a DevEUI; %+v", dmerror)
+	}
+	dm.Deveui = "A4C12BF"
+
+	dmerror = StoreDownlinkMessage(dm)
+	if dmerror != nil {
+		t.Errorf("Could not store downlink message: %+v", dmerror)
+	}
+	if dm.Id == 0 {
+		t.Error("Downlink message ID should be setted")
+	}
+	if dm.Time.IsZero() {
+		t.Error("Time should be setted on the message")
+	}
+}
+
 func TestPanic(t *testing.T) {
 	defer func() {
 		if r := recover(); r == nil {

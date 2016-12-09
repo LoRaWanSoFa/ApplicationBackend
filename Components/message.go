@@ -1,6 +1,10 @@
 package components
 
-import "time"
+import (
+	"net/url"
+	"strconv"
+	"time"
+)
 
 type MessageUplinkI interface {
 	AddPayload(p []byte, s Sensor)
@@ -9,6 +13,7 @@ type MessageUplinkI interface {
 	GetDevEUI() string
 	RemovePayloads()
 	AddPayloadString(str string, s Sensor)
+	ToJson() url.Values
 }
 
 type MessageUplink struct {
@@ -63,4 +68,14 @@ func (m *MessageUplink) GetId() int64 {
 
 func (m *MessageUplink) GetDevEUI() string {
 	return m.DevEUI
+}
+
+func (m *MessageUplink) ToJson() url.Values {
+	json := url.Values{}
+	payloads := m.GetPayloads()
+	for i := range payloads {
+		idString := strconv.FormatInt(payloads[i].GetSensor().Id, 10)
+		json.Add(idString, payloads[i].GetPayload().(string))
+	}
+	return json
 }

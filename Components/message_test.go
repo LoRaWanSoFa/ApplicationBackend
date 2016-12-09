@@ -49,4 +49,31 @@ func TestAddPayloadString(t *testing.T) {
 	if payloads[0].GetPayload() != "TestString" {
 		t.Errorf("Expected %+v, was %+v", "test", string(payloads[0].GetPayload().([]byte)))
 	}
+
+}
+func TestToJson(t *testing.T) {
+	m := NewMessageUplink(23, "devEUI")
+	firstSensor := NewHeaderSensor(77, 1, 2, 1, 1, "+1")
+	secondSensor := NewHeaderSensor(78, 1, 3, 2, 1, "+2")
+	m.AddPayloadString("test", firstSensor)
+	m.AddPayloadString("test2", firstSensor)
+	m.AddPayloadString("nose", secondSensor)
+	m.AddPayloadString("cheese", secondSensor)
+
+	json := m.ToJson()
+	if len(json["77"]) != 2 {
+		t.Errorf("Json should contain 2 entries for id 77, found %d", len(json))
+	} else if json["77"][0] != "test" {
+		t.Errorf("Json should contain \"test\" as first entry for id 77, found %s", json["77"][0])
+	} else if json["77"][1] != "test2" {
+		t.Errorf("Json should contain \"test2\" as second entry for id 77, found %s", json["77"][0])
+	}
+	if len(json["78"]) != 2 {
+		t.Errorf("Json should contain 2 entries for id 77, found %d", len(json))
+	} else if json["78"][0] != "nose" {
+		t.Errorf("Json should contain \"nose\" as first entry for id 78, found %s", json["77"][0])
+	} else if json["78"][1] != "cheese" {
+		t.Errorf("Json should contain \"cheese\" as second entry for id 78, found %s", json["77"][0])
+	}
+
 }

@@ -7,7 +7,11 @@ import (
 	"net/url"
 	"os"
 	"testing"
+
+	components "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
 )
+
+var testMessage = components.NewMessageUplink(123, "1234")
 
 var testData = struct {
 	nodeId    string
@@ -68,5 +72,5 @@ func TestDeleteSensor(t *testing.T) {
 }
 
 func TestNewData(t *testing.T) {
-	testConnector.NewData(testData.nodeId, testData.payload)
+	testConnector.NewData(testData.nodeId, testMessage)
 }
