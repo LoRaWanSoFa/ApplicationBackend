@@ -42,14 +42,14 @@ func TestUintTypes(t *testing.T) {
 		{"1311768467463790320", validByteArrays[7]},
 		{"4257912185020390702", validByteArrays[8]},
 	}
-	messageConverter := New()
+	byteConverter := New()
 	for _, item := range testData {
-		result, _ := messageConverter.ConvertSingleValue(item.payload, 0)
+		result, _ := byteConverter.ConvertSingleValue(item.payload, 0)
 		if result != item.expectedResult {
 			t.Errorf("Expected %s, was %s with payload %v", item.expectedResult, result, item.payload)
 		}
 	}
-	_, err := messageConverter.ConvertSingleValue(invalidByteArray, 0)
+	_, err := byteConverter.ConvertSingleValue(invalidByteArray, 0)
 	if err == nil {
 		t.Errorf("Uint message length should be invalid and produce an error %v", invalidByteArray)
 	}
@@ -70,14 +70,14 @@ func TestIntTypes(t *testing.T) {
 		{"1311768467463790320", validByteArrays[7]},
 		{"4257912185020390702", validByteArrays[8]},
 	}
-	messageConverter := New()
+	byteConverter := New()
 	for _, item := range testData {
-		result, _ := messageConverter.ConvertSingleValue(item.payload, 1)
+		result, _ := byteConverter.ConvertSingleValue(item.payload, 1)
 		if result != item.expectedResult {
 			t.Errorf("Expected %s, was %s with payload %v", item.expectedResult, result, item.payload)
 		}
 	}
-	_, err := messageConverter.ConvertSingleValue(invalidByteArray, 1)
+	_, err := byteConverter.ConvertSingleValue(invalidByteArray, 1)
 	if err == nil {
 		t.Errorf("Int message length should be invalid and produce an error %v", invalidByteArray)
 	}
@@ -92,14 +92,14 @@ func TestFloatTypes(t *testing.T) {
 		{"918.273645", []byte{0x40, 0x8C, 0xB2, 0x30, 0x6C, 0xCA, 0x2D, 0xB6}},
 		{"-918.273645", []byte{0xC0, 0x8C, 0xB2, 0x30, 0x6C, 0xCA, 0x2D, 0xB6}},
 	}
-	messageConverter := New()
+	byteConverter := New()
 	for _, item := range testData {
-		result, _ := messageConverter.ConvertSingleValue(item.payload, 2)
+		result, _ := byteConverter.ConvertSingleValue(item.payload, 2)
 		if result != item.expectedResult {
 			t.Errorf("Expected %s, was %s with payload %v", item.expectedResult, result, item.payload)
 		}
 	}
-	_, err := messageConverter.ConvertSingleValue(invalidByteArray, 2)
+	_, err := byteConverter.ConvertSingleValue(invalidByteArray, 2)
 	if err == nil {
 		t.Errorf("Float message length should be invalid and produce an error %v", invalidByteArray)
 	}
@@ -118,9 +118,9 @@ func TestStringConversion(t *testing.T) {
 			0x74, 0x69, 0x63, 0x65, 0x78, 0x70, 0x69, 0x61, 0x6C, 0x69, 0x64, 0x6F,
 			0x63, 0x69, 0x6F, 0x75, 0x73}},
 	}
-	messageConverter := New()
+	byteConverter := New()
 	for _, item := range testData {
-		result, _ := messageConverter.ConvertSingleValue(item.payload, 3)
+		result, _ := byteConverter.ConvertSingleValue(item.payload, 3)
 		if result != item.expectedResult {
 			t.Errorf("Expected %s, was %s with payload %v", item.expectedResult, result, item.payload)
 		}
@@ -136,14 +136,14 @@ func TestBooleanTypes(t *testing.T) {
 		{"true", []byte{0x01}},
 		{"false", []byte{0x00}},
 	}
-	messageConverter := New()
+	byteConverter := New()
 	for _, item := range testData {
-		result, _ := messageConverter.ConvertSingleValue(item.payload, 5)
+		result, _ := byteConverter.ConvertSingleValue(item.payload, 5)
 		if result != item.expectedResult {
 			t.Errorf("Expected %s, was %s with payload %v", item.expectedResult, result, item.payload)
 		}
 	}
-	_, err := messageConverter.ConvertSingleValue(invalidByteArray, 5)
+	_, err := byteConverter.ConvertSingleValue(invalidByteArray, 5)
 	if err == nil {
 		t.Errorf("Boolean message length should be invalid and produce an error %v", invalidByteArray)
 	}
@@ -165,9 +165,9 @@ func TestHexStringConversion(t *testing.T) {
 		{"3B172492A8F29D2E", validByteArrays[8]},
 		{"3B1724", []byte{0x3B, 0x17, 0x24}}, //testing a three length slice
 	}
-	messageConverter := New()
+	byteConverter := New()
 	for _, item := range testData {
-		result, _ := messageConverter.ConvertSingleValue(item.payload, 4)
+		result, _ := byteConverter.ConvertSingleValue(item.payload, 4)
 		if result != item.expectedResult {
 			t.Errorf("Expected %s, was %s with payload %v", item.expectedResult, result, item.payload)
 		}
@@ -175,8 +175,8 @@ func TestHexStringConversion(t *testing.T) {
 }
 
 func TestInvalidType(t *testing.T) {
-	messageConverter := New()
-	_, err := messageConverter.ConvertSingleValue(invalidByteArray, 99)
+	byteConverter := New()
+	_, err := byteConverter.ConvertSingleValue(invalidByteArray, 99)
 	if err == nil {
 		t.Errorf("Boolean message length should be invalid and produce an error %v", invalidByteArray)
 	}

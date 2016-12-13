@@ -39,7 +39,7 @@ func New() ByteConverter {
 // the value that has been received. The types that can be input are uint(0),
 // int(1), float(2), string(3), hexString(4) or bool(5).
 // Returns an error when an invalid type is chosen.
-func (m *byteConverter) ConvertSingleValue(payload []byte, conversion int) (string, error) {
+func (bc *byteConverter) ConvertSingleValue(payload []byte, conversion int) (string, error) {
 	var result string
 	var err error
 	switch conversionType(conversion) {
