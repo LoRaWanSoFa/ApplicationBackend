@@ -12,7 +12,7 @@ var devEuiS = "00000000ABCDEF12"
 
 func TestConvertMessage(t *testing.T) {
 	DatabaseConnector.Connect()
-	gpsSensor := components.NewSensor(3, 0, 0, 2, 4, 1, 2, "", "0")
+	gpsSensor := components.NewSensor(3, 0, 0, 0, 2, 4, 1, 2, "", "0")
 	inputMessage := components.NewMessageUplink(123, devEuiS)
 	inputMessage.AddPayload([]byte{0x42, 0x22, 0xEC, 0x25}, gpsSensor)
 	inputMessage.AddPayload([]byte{0xC2, 0x93, 0xDE, 0xD8}, gpsSensor)
