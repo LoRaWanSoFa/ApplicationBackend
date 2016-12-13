@@ -75,7 +75,7 @@ func Connect() error {
 	db.GetNodeHeaderSTMT, err = db.Database.Prepare("select sensors.id, number_of_values, lenght_of_values, header_order, conversion_expression, data_type " +
 		"from sensors " +
 		"join public.sensortypes on sensors.sensortype_id = sensortypes.id " +
-		"where deveui =$1 " +
+		"where deveui =$1 and header_order >= 0" +
 		"order by header_order asc;")
 	if err != nil {
 		return err
@@ -104,7 +104,6 @@ func Close() error {
 	return GetInstance().Database.Close()
 }
 
-//Not used, but can be used as example
 // Checks if the devEUI exists in the database.
 // Uses a database worker to execute the query.
 func CheckDevEUI(devEUI string) bool {
@@ -338,6 +337,49 @@ func GetNodeSensors(devEUI string) []mdl.Sensor {
 	}
 	sensors := workResult.Result.([]mdl.Sensor)
 	return sensors
+}
+
+func UpdateHeader(devEUI string, newheader []mdl.Sensor) error {
+	//check first
+	if len(newheader) == 0 {
+		return errors.New("No Sensors given")
+	}
+	if devEUI == "" {
+		return errors.New("Deveui must not be empty")
+	}
+	if !CheckDevEUI(devEUI) {
+		return errors.New("Deveui does not exist")
+	}
+	oldheader := GetNodeSensors(devEUI)
+	newSensortyps := make(map[string]mdl.Sensor)
+	if len(oldheader) == 0 {
+		//old header does not exist, insert new ones
+
+		for _, newS := range newheader {
+			newSensortyps[fmt.Sprintf("%s %d", newS.Conversion_expression, newS.DataType)] = newS
+		}
+		for _, sensor := range newSensortyps {
+			//Query: insert new sensortypes if not exist
+			log.Printf("insert into sensor_typs where !%+v and !%+v on dubplicate ignore", sensor.Conversion_expression, sensor.DataType)
+		}
+		//Query: insert new sensors with Deveui
+		return nil
+	}
+	sensortyps := make(map[string]bool)
+	for _, s := range oldheader {
+		sensortyps[fmt.Sprintf("%s %d", s.Conversion_expression, s.DataType)] = true
+	}
+	log.Printf("sensortyps map: %+v", sensortyps)
+	for _, newS := range newheader {
+		//check which newS is not in sensortyps; add those to newSensortyps
+		newS.Conversion_expression = ""
+	}
+	//Query: softdelete where Deveui
+	//Query: un-delete where Deveui and sensr iotype/ioaddress/sensorstype
+	//Query: insert new sensortypes
+	//Query: insert new sensors with Deveui
+
+	return nil
 }
 
 func isOffline() bool {
