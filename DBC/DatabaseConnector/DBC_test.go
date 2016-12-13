@@ -129,6 +129,32 @@ func TestStoreDownlinkMessage(t *testing.T) {
 	}
 }
 
+func TestUpdateHeader(t *testing.T) {
+	newHeader := make([]mdl.Sensor, 0)
+	deveui := ""
+	var err error
+	err = UpdateHeader(deveui, newHeader)
+	if err == nil || err.Error() != "No Sensors given" {
+		t.Errorf("Should not implicitly delete the current header")
+	}
+	newHeader = append(newHeader, mdl.NewSensor(0, 1, 4, 1, 1, 1, 1, "description", "conversion_expression"))
+	err = UpdateHeader(deveui, newHeader)
+	if err == nil || err.Error() != "Deveui must not be empty" {
+		t.Errorf("Deveui must not be empty")
+	}
+	deveui = "TEST_DEVEUI_THAT_DOES_NOT_EXIST"
+	err = UpdateHeader(deveui, newHeader)
+	if err == nil || err.Error() != "Deveui does not exist" {
+		t.Errorf("Deveui does not exist")
+	}
+	deveui = "A4C12BF"
+	err = UpdateHeader(deveui, newHeader)
+	if err != nil {
+		t.Errorf("did not expect an error: %+v", err)
+	}
+
+}
+
 func TestPanic(t *testing.T) {
 	defer func() {
 		if r := recover(); r == nil {
