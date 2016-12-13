@@ -30,8 +30,8 @@ func TestAddSimpleMessage(t *testing.T) {
 }
 
 func TestCheckPayloads(t *testing.T) {
-	gpsSensor := components.NewSensor(3, 0, 0, 2, 4, 1, 2, "", "0")
-	boolSensor := components.NewSensor(4, 0, 0, 1, 1, 2, 5, "", "0")
+	gpsSensor := components.NewSensor(3, 0, 0, 0, 2, 4, 1, 2, "", "0")
+	boolSensor := components.NewSensor(4, 0, 0, 0, 1, 1, 2, 5, "", "0")
 	expectedMessage := components.NewMessageUplink(123, devEuiS)
 	expectedMessage.AddPayload([]byte{0x42, 0x22, 0xEC, 0x25}, gpsSensor)
 	expectedMessage.AddPayload([]byte{0xC2, 0x93, 0xDE, 0xD8}, gpsSensor)
