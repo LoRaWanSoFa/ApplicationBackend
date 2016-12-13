@@ -2,8 +2,9 @@ package components
 
 type Sensor struct {
 	Id                    int64  //sensor.id
-	IoType                int64  //NotNeeded
+	IoType                int64  //sensortype.id
 	IoAddress             int    //NotNeeded
+	SensorType            int    //Not the ID but the actual sensortype number
 	NumberOfValues        int    //lenght of bytes that belong to this sensor (between 1 and 8)
 	LenghtOfValues        int    //number of values that belong to this sensor (1,2,4 or 8)
 	HeaderOrder           int    //index in which the messages are send that belong to this sensor
@@ -21,7 +22,7 @@ func NewHeaderSensor(
 	data_type int,
 	conversion_expression string) Sensor {
 	//return sensor(id:id, IoType:io_type)
-	return Sensor{id, 0, 0, number_of_values, lenght_of_values, header_order, "", conversion_expression, data_type}
+	return Sensor{id, 0, 0, 0, number_of_values, lenght_of_values, header_order, "", conversion_expression, data_type}
 }
 
 //Default constructor
@@ -29,11 +30,14 @@ func NewSensor(
 	id,
 	ioType int64,
 	ioAddress,
+	sensor_type,
 	number_of_values,
 	lenght_of_values,
 	header_order,
 	data_type int,
 	description,
 	conversion_expression string) Sensor {
-	return Sensor{id, ioType, ioAddress, number_of_values, lenght_of_values, header_order, description, conversion_expression, data_type}
+	return Sensor{Id: id, IoType: ioType, IoAddress: ioAddress, SensorType: sensor_type,
+		NumberOfValues: number_of_values, LenghtOfValues: lenght_of_values,
+		HeaderOrder: header_order, Description: description, Conversion_expression: conversion_expression, DataType: data_type}
 }
