@@ -6,7 +6,7 @@ import (
 	"log"
 
 	components "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
-	"github.com/LoRaWanSoFa/LoRaWanSoFa/Core/MessageConverter"
+	"github.com/LoRaWanSoFa/LoRaWanSoFa/Core/ByteConverter"
 	DBC "github.com/LoRaWanSoFa/LoRaWanSoFa/DBC/DatabaseConnector"
 )
 
@@ -15,7 +15,7 @@ type MessageCreator interface {
 }
 
 type messageCreator struct {
-	messageConverter MessageConverter.MessageConverter
+	byteConverter byteConverter.ByteConverter
 }
 
 // A messageCreator is created, the purpose of the MessageCreator is to
@@ -23,7 +23,7 @@ type messageCreator struct {
 // to the MessageUplinkI format for further use.
 func NewMessageCreator() MessageCreator {
 	mc := new(messageCreator)
-	mc.messageConverter = MessageConverter.New()
+	mc.byteConverter = byteConverter.New()
 	return mc
 }
 
@@ -34,7 +34,7 @@ func (m *messageCreator) CreateMessage(payload []byte, devEui []byte) (component
 	var message components.MessageUplinkI
 	var sensors []components.Sensor
 	// Convert devEui from bytes into a hexadecimal representation of them as a string.
-	devEuiS, err := m.messageConverter.ConvertSingleValue(devEui, 4)
+	devEuiS, err := m.byteConverter.ConvertSingleValue(devEui, 4)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err

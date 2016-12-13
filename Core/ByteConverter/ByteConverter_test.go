@@ -1,4 +1,4 @@
-package MessageConverter
+package byteConverter
 
 import "testing"
 

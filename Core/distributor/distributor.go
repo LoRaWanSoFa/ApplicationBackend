@@ -5,7 +5,7 @@ import (
 	"log"
 
 	components "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
-	"github.com/LoRaWanSoFa/LoRaWanSoFa/Core/MessageConverter"
+	"github.com/LoRaWanSoFa/LoRaWanSoFa/Core/ByteConverter"
 	"github.com/LoRaWanSoFa/LoRaWanSoFa/Core/restUplinkConnector"
 	"github.com/LoRaWanSoFa/LoRaWanSoFa/DBC/DatabaseConnector"
 )
@@ -16,13 +16,13 @@ type Distributor interface {
 }
 
 type distributor struct {
-	messageConverter    MessageConverter.MessageConverter
+	byteConverter       byteConverter.ByteConverter
 	restUplinkConnector restUplink.RestUplinkConnector
 }
 
 func New() Distributor {
 	dist := new(distributor)
-	dist.messageConverter = MessageConverter.New()
+	dist.byteConverter = byteConverter.New()
 	config := components.GetConfiguration().Rest
 	dist.restUplinkConnector = restUplink.NewRestUplinkConnector(config.Ip, config.ApiKey)
 	return dist
@@ -63,7 +63,7 @@ func (d *distributor) convertMessage(message components.MessageUplinkI) componen
 		payload, ok := bytePayloads[i].GetPayload().([]byte)
 		if ok {
 			sensor := bytePayloads[i].GetSensor()
-			payloadS, err := d.messageConverter.ConvertSingleValue(payload, sensor.DataType)
+			payloadS, err := d.byteConverter.ConvertSingleValue(payload, sensor.DataType)
 			if err != nil {
 				log.Fatal(err)
 			} else {
