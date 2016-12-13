@@ -46,8 +46,18 @@ func (m *messageCreator) CreateMessage(payload []byte, devEui []byte) (component
 		err = errors.New(fmt.Sprintf("There was no header received for %s", devEuiS))
 		return nil, err
 	}
+
 	// adding payloads to the newly created message
-	m.addPayloads(payload[1:], &message, sensors)
+	b, headerLength := m.checkPayloadLength(payload[1:], sensors)
+	if b {
+		m.addPayloads(payload[1:], &message, sensors)
+	} else {
+		err = errors.New(fmt.Sprintf("The existing header for %s is not of the "+
+			"right length for the received message. Header length was %d, while "+
+			"payload length was %d.", devEuiS, headerLength, len(payload[1:])))
+		return nil, err
+	}
+
 	return message, nil
 }
 
@@ -60,4 +70,14 @@ func (m *messageCreator) addPayloads(payload []byte, message *components.Message
 			payload = payload[LoV:]
 		}
 	}
+}
+
+func (m *messageCreator) checkPayloadLength(payload []byte, sensors []components.Sensor) (bool, int) {
+	length := 0
+	for i := range sensors {
+		LoV := sensors[i].LenghtOfValues
+		NoV := sensors[i].NumberOfValues
+		length = length + (LoV * NoV)
+	}
+	return length == len(payload), length
 }
