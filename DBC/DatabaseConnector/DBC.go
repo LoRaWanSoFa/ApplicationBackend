@@ -1,3 +1,4 @@
+//This package handels the communication with the database.
 package DatabaseConnector
 
 import (
@@ -60,7 +61,7 @@ func GetInstance() *DatabaseConnector {
 			log.Fatal(err)
 		}
 		log.Print("not connected yet")
-		StartDispatcher(settings.NumberOfWorkers)
+		startDispatcher(settings.NumberOfWorkers)
 	})
 	return instantiated
 }

@@ -18,7 +18,7 @@ type Worker struct {
 	QuitChan    chan bool
 }
 
-func (w *Worker) Start() {
+func (w *Worker) start() {
 	go func() {
 		for {
 			// Add ourselves into the worker queue.
@@ -40,7 +40,7 @@ func (w *Worker) Start() {
 // Stop tells the worker to stop listening for work requests.
 //
 // Note that the worker will only stop *after* it has finished its work.
-func (w *Worker) Stop() {
+func (w *Worker) stop() {
 	go func() {
 		w.QuitChan <- true
 	}()

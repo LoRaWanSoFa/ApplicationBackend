@@ -4,11 +4,11 @@ var WorkerQueue chan chan WorkRequest
 var workers chan Worker
 var stop bool
 
-func StopWorker() bool {
+func stopWorker() bool {
 	select {
 	case w, ok := <-workers:
 		if ok {
-			w.Stop()
+			w.stop()
 			return true
 		} else {
 			//channel workers is nil / not initialized
@@ -20,14 +20,14 @@ func StopWorker() bool {
 	}
 }
 
-func StopDispatcher() {
+func stopDispatcher() {
 	defer close(workers)
-	for StopWorker() {
+	for stopWorker() {
 	}
 	stop = true
 }
 
-func StartDispatcher(nworkers int) {
+func startDispatcher(nworkers int) {
 	// First, initialize the channel we are going to put the workers' work channels into.
 	WorkerQueue = make(chan chan WorkRequest, nworkers)
 	workers = make(chan Worker, nworkers)
@@ -35,7 +35,7 @@ func StartDispatcher(nworkers int) {
 	for i := 0; i < nworkers; i++ {
 		//fmt.Println("Starting worker", i+1)
 		worker := NewWorker(i+1, WorkerQueue)
-		worker.Start()
+		worker.start()
 		workers <- worker
 	}
 
