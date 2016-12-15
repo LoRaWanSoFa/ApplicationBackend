@@ -1,5 +1,7 @@
 package DatabaseConnector
 
+import "time"
+
 var WorkerQueue chan chan WorkRequest
 var workers chan Worker
 var stop bool
@@ -56,6 +58,7 @@ func startDispatcher(nworkers int) {
 				if stop == true {
 					break
 				}
+				time.Sleep(10 * time.Millisecond) //Sleep a bit when there is no work. performance reasons.
 			}
 		}
 	}()
