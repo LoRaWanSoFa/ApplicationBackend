@@ -2,18 +2,19 @@ package mqttUplink
 
 import (
 	"errors"
+	"log"
 	"os"
-
-	goLog "log"
 
 	"github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
 	"github.com/LoRaWanSoFa/LoRaWanSoFa/Core/distributor"
 	"github.com/LoRaWanSoFa/ttn/core"
 	"github.com/LoRaWanSoFa/ttn/core/types"
 	"github.com/LoRaWanSoFa/ttn/mqtt"
-	"github.com/apex/log"
+	apexLog "github.com/apex/log"
 	"github.com/apex/log/handlers/text"
 )
+
+var logFatal = log.Fatal
 
 type MqttClient interface {
 	Connect() error
@@ -40,31 +41,31 @@ func uplinkMessageHandler(client mqtt.Client, appEUI types.AppEUI, devEUI types.
 		if flag>>4 == 1 {
 			header, err := hHandler.CreateNewHeader(req.Payload, devEUI.GoString())
 			if err != nil {
-				goLog.Fatal(err)
+				logFatal(err)
 			} else {
 				err = hHandler.StoreHeader(header, devEUI.GoString())
 				if err != nil {
-					goLog.Fatal(err)
+					logFatal(err)
 				}
 			}
 		} else if flag>>5 == 1 {
 			message, err := mCreator.CreateMessage(req.Payload, devEUI.GoString())
 			if err != nil {
-				goLog.Fatal(err)
+				logFatal(err)
 			} else {
 				dist.InputUplink(message)
 			}
 		} else {
 			err := errors.New("No valid flag")
-			goLog.Fatal(err)
+			logFatal(err)
 		}
 	}
 }
 
 func (m *mqttClient) Connect() error {
-	log.SetHandler(text.New(os.Stderr))
+	apexLog.SetHandler(text.New(os.Stderr))
 	mqttConfig := components.GetConfiguration().Mqtt
-	ctx := log.WithField("distributorClient", "mqtt-distributorClient")
+	ctx := apexLog.WithField("distributorClient", "mqtt-distributorClient")
 	m.client = mqtt.NewClient(ctx, "ttnctl", mqttConfig.AppEUI, mqttConfig.Password, mqttConfig.Address)
 	if err := m.client.Connect(); err != nil {
 		return errors.New("Could not connect")
