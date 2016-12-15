@@ -65,4 +65,6 @@ func TestUplinkMessageHandler(t *testing.T) {
 	if !strings.Contains(errs[2], "not of the right length for the received message.") {
 		t.Errorf("Should have header - payload length mismatch error, but got: %+v.", errs[2])
 	}
+
+	mClient.Disconnect()
 }
