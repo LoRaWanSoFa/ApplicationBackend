@@ -16,11 +16,16 @@ type HeaderHandler interface {
 type headerHandler struct {
 }
 
+// Will create a new HeaderHandler
 func NewHeaderHandler() HeaderHandler {
 	h := new(headerHandler)
 	return h
 }
 
+// Creates a new Header from the received payload and a devEUI.
+// A header always needs to have a length of a number divisible by 3 + 1.
+// e.g.: 4, 7, 10, 13...
+// Otherwise an error is returned.
 func (h *headerHandler) CreateNewHeader(payload []byte, devEUI string) ([]components.Sensor, error) {
 	var sensors []components.Sensor
 	if h.checkLength(payload) {
@@ -36,6 +41,10 @@ func (h *headerHandler) CreateNewHeader(payload []byte, devEUI string) ([]compon
 	return sensors, nil
 }
 
+// Stores a received header in the database.
+// The current header is compared to the new header and all changes that might
+// occur are updated in the database.
+// Errors returned here will always be database errors.
 func (h *headerHandler) StoreHeader(newHeader []components.Sensor, devEUI string) error {
 	oldHeader, err := DatabaseConnector.GetFullHeader(devEUI)
 	if err != nil {
@@ -71,6 +80,8 @@ func (h *headerHandler) StoreHeader(newHeader []components.Sensor, devEUI string
 	return nil
 }
 
+// Helper method to check if a sensor is contained in a set of Sensors, when it
+// is contained the position of the sensor in the set of sensors will be returned as well.
 func (h *headerHandler) containsSensor(sensor components.Sensor, sensors []components.Sensor) (bool, int) {
 	for i := range sensors {
 		if sensor.SameSensor(sensors[i]) {
@@ -80,6 +91,8 @@ func (h *headerHandler) containsSensor(sensor components.Sensor, sensors []compo
 	return false, 0
 }
 
+// Creates a single sensor from a byte slice, the byte slice received here will
+// always be of length 3 due to the used protocol.
 func (h *headerHandler) createSensor(payload []byte) components.Sensor {
 	var sensor components.Sensor
 
@@ -111,6 +124,7 @@ func (h *headerHandler) createSensor(payload []byte) components.Sensor {
 	return sensor
 }
 
+// Method that checks if the received payload is of a valid size.
 func (hc *headerHandler) checkLength(payload []byte) bool {
 	return len(payload)%3 == 1
 }

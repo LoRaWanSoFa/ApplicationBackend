@@ -35,6 +35,9 @@ var hHandler = NewHeaderHandler()
 var mCreator = NewMessageCreator()
 var dist = distributor.New()
 
+// Handles uplink messages received from the backend. Depending on the flag send
+// with the payload (First byte), either a header is created / changed or a
+// message is added to the database.
 func uplinkMessageHandler(client mqtt.Client, appEUI types.AppEUI, devEUI types.DevEUI, req core.DataUpAppReq) {
 	if len(req.Payload) > 0 {
 		flag := req.Payload[0]
@@ -62,6 +65,8 @@ func uplinkMessageHandler(client mqtt.Client, appEUI types.AppEUI, devEUI types.
 	}
 }
 
+// Method that connects the mqtt client to the backend, received messages are
+// send to the uplinkMessageHandler.
 func (m *mqttClient) Connect() error {
 	apexLog.SetHandler(text.New(os.Stderr))
 	mqttConfig := components.GetConfiguration().Mqtt
@@ -75,10 +80,12 @@ func (m *mqttClient) Connect() error {
 	return nil
 }
 
+// Disconnects the mqtt client, used for a graceful shutdown.
 func (m *mqttClient) Disconnect() {
 	m.client.Disconnect()
 }
 
+// Gets the internal mqtt client used.
 func (m *mqttClient) GetClient() mqtt.Client {
 	return m.client
 }
