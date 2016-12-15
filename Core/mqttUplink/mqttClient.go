@@ -30,16 +30,25 @@ func New() MqttClient {
 	return client
 }
 
-var creator = NewMessageCreator()
+var hHandler = NewHeaderHandler()
+var mCreator = NewMessageCreator()
 var dist = distributor.New()
 
 func uplinkMessageHandler(client mqtt.Client, appEUI types.AppEUI, devEUI types.DevEUI, req core.DataUpAppReq) {
 	if len(req.Payload) > 0 {
 		flag := req.Payload[0]
 		if flag>>4 == 1 {
-			//TODO: implement header handling
+			header, err := hHandler.CreateNewHeader(req.Payload, devEUI.GoString())
+			if err != nil {
+				goLog.Fatal(err)
+			} else {
+				err = hHandler.StoreHeader(header, devEUI.GoString())
+				if err != nil {
+					goLog.Fatal(err)
+				}
+			}
 		} else if flag>>5 == 1 {
-			message, err := creator.CreateMessage(req.Payload, devEUI.Bytes())
+			message, err := mCreator.CreateMessage(req.Payload, devEUI.GoString())
 			if err != nil {
 				goLog.Fatal(err)
 			} else {
