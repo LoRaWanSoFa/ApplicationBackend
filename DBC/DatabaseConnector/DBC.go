@@ -24,6 +24,7 @@ type DatabaseConnector struct {
 	insertDownlinkMessageSTMT       *sql.Stmt
 	getFullHeaderSTMT               *sql.Stmt
 	changeSensorActivationStateSTMT *sql.Stmt
+	checkSensorTypeSTMT             *sql.Stmt
 	addSensorTypeSTMT               *sql.Stmt
 	addSensorSTMT                   *sql.Stmt
 	updateSensorOrderSTMT           *sql.Stmt
@@ -107,6 +108,10 @@ func Connect() error {
 		"join public.sensortypes on sensors.sensortype_id = sensortypes.id " +
 		"where deveui =$1 " +
 		"order by soft_deleted, header_order;")
+	if err != nil {
+		return err
+	}
+	db.checkSensorTypeSTMT, err = db.Database.Prepare("select id from sensortypes where sensor_type=$1 limit 1")
 	if err != nil {
 		return err
 	}
@@ -372,12 +377,12 @@ func GetFullHeader(devEUI string) ([]mdl.Sensor, error) {
 		}
 		sensors := make([]mdl.Sensor, 0)
 		var sid, stid int64
-		var io_address, io_type, number_of_values, lenght_of_values, header_order, data_type int
+		var io_address, io_type, number_of_values, lenght_of_values, header_order, data_type, sensor_type int
 		var conversion_expression, description string
 		var soft_deleted bool
 
 		for rows.Next() {
-			err = rows.Scan(&sid, &stid, &io_address, &io_type, &number_of_values, &lenght_of_values, &header_order, &conversion_expression, &description, &data_type, &soft_deleted)
+			err = rows.Scan(&sid, &stid, &io_address, &io_type, &number_of_values, &lenght_of_values, &header_order, &conversion_expression, &description, &data_type, &sensor_type, &soft_deleted)
 			if err != nil {
 				panic(err.Error())
 			}
@@ -386,6 +391,7 @@ func GetFullHeader(devEUI string) ([]mdl.Sensor, error) {
 				stid,
 				io_address,
 				io_type,
+				sensor_type,
 				number_of_values,
 				lenght_of_values,
 				header_order,
@@ -405,6 +411,33 @@ func GetFullHeader(devEUI string) ([]mdl.Sensor, error) {
 	}
 	sensors := workResult.Result.([]mdl.Sensor)
 	return sensors, nil
+}
+
+func AddSensor(sensor mdl.Sensor) error {
+	//does s.type exist?
+	//no -> insert new type
+	//inset s
+	return nil
+}
+
+func getSensorTypeId(sensorType int) (int64, error) {
+	result := make(chan WorkResult)
+	defer close(result)
+	args := make([]interface{}, 1)
+	args[0] = sensorType
+	WorkQueue <- WorkRequest{Query: "", Arguments: args, ResultChannel: result, F: func(w *WorkRequest) {
+		row := GetInstance().checkDevEUISTMT.QueryRow(w.Arguments...)
+		var id int64
+		err := row.Scan(&id)
+		if err != nil {
+			w.ResultChannel <- WorkResult{Result: 0, err: err}
+			return
+		}
+		w.ResultChannel <- WorkResult{Result: id, err: err}
+	}}
+	var workResult = <-result
+	checkErr(workResult.err)
+	return workResult.Result.(int64), workResult.err
 }
 
 func UpdateHeader(devEUI string, newheader []mdl.Sensor) error {

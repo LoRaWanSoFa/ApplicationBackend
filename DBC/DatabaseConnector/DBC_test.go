@@ -137,7 +137,7 @@ func TestUpdateHeader(t *testing.T) {
 	if err == nil || err.Error() != "No Sensors given" {
 		t.Errorf("Should not implicitly delete the current header")
 	}
-	newHeader = append(newHeader, mdl.NewSensor(0, 1, 4, 0, 1, 1, 1, 1, "description", "conversion_expression", false))
+	newHeader = append(newHeader, mdl.NewSensor(0, 1, 4, 1, 0, 1, 1, 1, 1, "description", "conversion_expression", false))
 	err = UpdateHeader(deveui, newHeader)
 	if err == nil || err.Error() != "Deveui must not be empty" {
 		t.Errorf("Deveui must not be empty")
