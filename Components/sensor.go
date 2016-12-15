@@ -11,6 +11,7 @@ type Sensor struct {
 	Description           string //NotNeeded - user input
 	Conversion_expression string //math expression that transforms the message
 	DataType              int    // or int or string, or anything that shows what type of data this sensor is returning
+	Soft_deleted          bool   //true if the sensor is deleted
 }
 
 // Headersensor will return a sensor object with default values for fields that are not needed durring proccesing
@@ -22,7 +23,7 @@ func NewHeaderSensor(
 	data_type int,
 	conversion_expression string) Sensor {
 	//return sensor(id:id, IoType:io_type)
-	return Sensor{id, 0, 0, 0, number_of_values, lenght_of_values, header_order, "", conversion_expression, data_type}
+	return Sensor{id, 0, 0, 0, number_of_values, lenght_of_values, header_order, "", conversion_expression, data_type, false}
 }
 
 //Default constructor
@@ -36,8 +37,10 @@ func NewSensor(
 	header_order,
 	data_type int,
 	description,
-	conversion_expression string) Sensor {
+	conversion_expression string,
+	soft_deleted bool) Sensor {
 	return Sensor{Id: id, IoType: ioType, IoAddress: ioAddress, SensorType: sensor_type,
 		NumberOfValues: number_of_values, LenghtOfValues: lenght_of_values,
-		HeaderOrder: header_order, Description: description, Conversion_expression: conversion_expression, DataType: data_type}
+		HeaderOrder: header_order, Description: description,
+		Conversion_expression: conversion_expression, DataType: data_type, Soft_deleted: soft_deleted}
 }
