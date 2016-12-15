@@ -1,4 +1,6 @@
 //This package handels the communication with the database.
+//It only contains prepared querys that are needed for the backend.
+//It has a maximum amount of querys that can happen simultaniously
 package DatabaseConnector
 
 import (
@@ -15,15 +17,15 @@ import (
 
 type DatabaseConnector struct {
 	Database                        *sql.DB
-	CheckDevEUISTMT                 *sql.Stmt
-	GetNodeHeaderSTMT               *sql.Stmt
-	InsertMessageSTMT               *sql.Stmt
-	InsertPayloadSTMT               *sql.Stmt
-	InsertDownlinkMessageSTMT       *sql.Stmt
-	GetFullHeaderSTMT               *sql.Stmt
-	ChangeSensorActivationStateSTMT *sql.Stmt
-	AddSensorTypeSTMT               *sql.Stmt
-	AddSensorSTMT                   *sql.Stmt
+	checkDevEUISTMT                 *sql.Stmt
+	getNodeHeaderSTMT               *sql.Stmt
+	insertMessageSTMT               *sql.Stmt
+	insertPayloadSTMT               *sql.Stmt
+	insertDownlinkMessageSTMT       *sql.Stmt
+	getFullHeaderSTMT               *sql.Stmt
+	changeSensorActivationStateSTMT *sql.Stmt
+	addSensorTypeSTMT               *sql.Stmt
+	addSensorSTMT                   *sql.Stmt
 	updateSensorOrderSTMT           *sql.Stmt
 }
 
@@ -74,11 +76,11 @@ func Connect() error {
 		return err
 	}
 	time.Sleep(1000 * time.Millisecond) //Wait for connections to finnish setting up. 1 sec is propably too long, can be finetuned later
-	db.CheckDevEUISTMT, err = db.Database.Prepare("select exists(select 1 from nodes where deveui=$1)")
+	db.checkDevEUISTMT, err = db.Database.Prepare("select exists(select 1 from nodes where deveui=$1)")
 	if err != nil {
 		return err
 	}
-	db.GetNodeHeaderSTMT, err = db.Database.Prepare("select sensors.id, number_of_values, lenght_of_values, header_order, conversion_expression, data_type " +
+	db.getNodeHeaderSTMT, err = db.Database.Prepare("select sensors.id, number_of_values, lenght_of_values, header_order, conversion_expression, data_type " +
 		"from sensors " +
 		"join public.sensortypes on sensors.sensortype_id = sensortypes.id " +
 		"where deveui =$1 and header_order >= 0" +
@@ -86,21 +88,21 @@ func Connect() error {
 	if err != nil {
 		return err
 	}
-	db.InsertMessageSTMT, err = db.Database.Prepare("INSERT INTO public.messages(" +
+	db.insertMessageSTMT, err = db.Database.Prepare("INSERT INTO public.messages(" +
 		"deveui, created_at, down) " +
 		"VALUES ($1, NOW(), false) " +
 		"RETURNING id;")
 	if err != nil {
 		return err
 	}
-	db.InsertDownlinkMessageSTMT, err = db.Database.Prepare("INSERT INTO public.messages(" +
+	db.insertDownlinkMessageSTMT, err = db.Database.Prepare("INSERT INTO public.messages(" +
 		"deveui, created_at, down) " +
 		"VALUES ($1, $2, true) " +
 		"RETURNING id;")
 	if err != nil {
 		return err
 	}
-	db.GetFullHeaderSTMT, err = db.Database.Prepare("select sensors.id, sensortypes.id, io_address, io_type, number_of_values, lenght_of_values, header_order, conversion_expression, description, data_type, soft_deleted " +
+	db.getFullHeaderSTMT, err = db.Database.Prepare("select sensors.id, sensortypes.id, io_address, io_type, number_of_values, lenght_of_values, header_order, conversion_expression, description, data_type, soft_deleted " +
 		"from sensors " +
 		"join public.sensortypes on sensors.sensortype_id = sensortypes.id " +
 		"where deveui =$1 " +
@@ -108,7 +110,7 @@ func Connect() error {
 	if err != nil {
 		return err
 	}
-	db.InsertPayloadSTMT, err = db.Database.Prepare("INSERT INTO public.message_payloads(" +
+	db.insertPayloadSTMT, err = db.Database.Prepare("INSERT INTO public.message_payloads(" +
 		"message_id, sensor_id, payload) " +
 		"VALUES ($1, $2, $3);")
 	return err
@@ -126,7 +128,7 @@ func CheckDevEUI(devEUI string) bool {
 	args := make([]interface{}, 1)
 	args[0] = devEUI
 	WorkQueue <- WorkRequest{Query: "", Arguments: args, ResultChannel: result, F: func(w *WorkRequest) {
-		rows, err := GetInstance().CheckDevEUISTMT.Query(w.Arguments...)
+		rows, err := GetInstance().checkDevEUISTMT.Query(w.Arguments...)
 		defer rows.Close()
 		checkErr(err)
 		if err != nil {
@@ -157,7 +159,7 @@ func AddMessage(devEUI string) (mdl.MessageUplinkI, error) {
 	//create and add new WorkRequest
 	WorkQueue <- WorkRequest{Query: "", Arguments: args, ResultChannel: result, F: func(w *WorkRequest) {
 		var messageId int64
-		rows, err := GetInstance().InsertMessageSTMT.Query(w.Arguments...)
+		rows, err := GetInstance().insertMessageSTMT.Query(w.Arguments...)
 
 		checkErr(err)
 		if err != nil {
@@ -216,7 +218,7 @@ func insertPayload(parameters []interface{}) error {
 	result := make(chan WorkResult)
 	defer close(result)
 	WorkQueue <- WorkRequest{Query: "", Arguments: parameters, ResultChannel: result, F: func(w *WorkRequest) {
-		rows, err := GetInstance().InsertPayloadSTMT.Query(w.Arguments...)
+		rows, err := GetInstance().insertPayloadSTMT.Query(w.Arguments...)
 
 		checkErr(err)
 		if err != nil {
@@ -281,7 +283,7 @@ func addDownlinkMessage(message *mdl.MessageDownLink) error {
 	//create and add new WorkRequest
 	WorkQueue <- WorkRequest{Query: "", Arguments: args, ResultChannel: result, F: func(w *WorkRequest) {
 		var messageId int64
-		rows, err := GetInstance().InsertDownlinkMessageSTMT.Query(w.Arguments...)
+		rows, err := GetInstance().insertDownlinkMessageSTMT.Query(w.Arguments...)
 
 		checkErr(err)
 		if err != nil {
@@ -316,7 +318,7 @@ func GetNodeSensors(devEUI string) []mdl.Sensor {
 	args[0] = devEUI
 	WorkQueue <- WorkRequest{Query: "", Arguments: args, ResultChannel: result, F: func(w *WorkRequest) {
 		//rows, err := GetInstance().Database.Query(w.Query, w.Arguments...)
-		rows, err := GetInstance().GetNodeHeaderSTMT.Query(w.Arguments...)
+		rows, err := GetInstance().getNodeHeaderSTMT.Query(w.Arguments...)
 		defer rows.Close()
 		checkErr(err)
 		if err != nil {
@@ -361,7 +363,7 @@ func GetFullHeader(devEUI string) ([]mdl.Sensor, error) {
 	args[0] = devEUI
 
 	WorkQueue <- WorkRequest{Query: "", Arguments: args, ResultChannel: result, F: func(w *WorkRequest) {
-		rows, err := GetInstance().GetFullHeaderSTMT.Query(w.Arguments...)
+		rows, err := GetInstance().getFullHeaderSTMT.Query(w.Arguments...)
 		defer rows.Close()
 		checkErr(err)
 		if err != nil {
