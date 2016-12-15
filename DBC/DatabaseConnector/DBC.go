@@ -99,7 +99,7 @@ func Connect() error {
 	if err != nil {
 		return err
 	}
-	db.GetFullHeaderSTMT, err = db.Database.Prepare("select sensors.id, sensortypes.id, io_address, io_type, number_of_values, lenght_of_values, header_order, conversion_expression, description, data_type " +
+	db.GetFullHeaderSTMT, err = db.Database.Prepare("select sensors.id, sensortypes.id, io_address, io_type, number_of_values, lenght_of_values, header_order, conversion_expression, description, data_type, soft_deleted " +
 		"from sensors " +
 		"join public.sensortypes on sensors.sensortype_id = sensortypes.id " +
 		"where deveui =$1 " +
@@ -371,9 +371,10 @@ func GetFullHeader(devEUI string) ([]mdl.Sensor, error) {
 		var sid, stid int64
 		var io_address, io_type, number_of_values, lenght_of_values, header_order, data_type int
 		var conversion_expression, description string
+		var soft_deleted bool
 
 		for rows.Next() {
-			err = rows.Scan(&sid, &stid, &io_address, &io_type, &number_of_values, &lenght_of_values, &header_order, &conversion_expression, &description, &data_type)
+			err = rows.Scan(&sid, &stid, &io_address, &io_type, &number_of_values, &lenght_of_values, &header_order, &conversion_expression, &description, &data_type, &soft_deleted)
 			if err != nil {
 				panic(err.Error())
 			}
@@ -387,7 +388,8 @@ func GetFullHeader(devEUI string) ([]mdl.Sensor, error) {
 				header_order,
 				data_type,
 				description,
-				conversion_expression)
+				conversion_expression,
+				soft_deleted)
 			sensors = append(sensors, s)
 		}
 		w.ResultChannel <- WorkResult{Result: sensors, err: err}
