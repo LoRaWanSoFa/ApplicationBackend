@@ -46,7 +46,7 @@ func TestStorePayload(t *testing.T) {
 		t.Errorf("The addition of %+v \n Should not fail, but got %+v.", expectedSensors, err)
 	}
 
-	differentSensor := components.Sensor{IoType: 1, IoAddress: 1, SensorType: 0, LenghtOfValues: 4, NumberOfValues: 2, HeaderOrder: 1}
+	differentSensor := components.Sensor{IoType: 1, IoAddress: 1, SensorType: 0, LenghtOfValues: 4, NumberOfValues: 2, HeaderOrder: 3}
 	expectedSensors[2] = differentSensor
 	err = h.StoreHeader(expectedSensors, devEuiS)
 	if err != nil {
