@@ -4,7 +4,6 @@ import (
 	"log"
 	"time"
 
-	mdl "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
 	dbc "github.com/LoRaWanSoFa/LoRaWanSoFa/DBC/DatabaseConnector"
 	_ "github.com/lib/pq"
 )
@@ -19,9 +18,19 @@ func main() {
 	defer dbc.Close()
 	time.Sleep(1000 * time.Millisecond) // wait a bit for simulation purposes
 	log.Println("Start sending data now:")
+
+	sensors, err := dbc.GetFullHeader("A4C12BF")
+	checkErr(err)
+	log.Printf("sonsors: %+v", sensors)
+
 	//dbc.GetNodeSensorsb("")
-	sensors := dbc.GetNodeSensors("A4C12BF")
-	log.Printf("sensors: %+v", sensors)
+	//sensors := dbc.GetNodeSensors("A4C12BF")
+	//log.Printf("sensors: %+v", sensors)
+
+	// newHeader := make([]mdl.Sensor, 0)
+	// newHeader = append(newHeader, mdl.NewSensor(0, 1, 4, 0, 1, 1, 1, 1, "description", "conversion_expression"))
+	// err := dbc.UpdateHeader("A4C12BF", newHeader)
+	// checkErr(err)
 
 	//m := mdl.NewMessageUplink(76, "A4C12BF")
 	// m, err := dbc.AddMessage("A4C12BF")
@@ -38,15 +47,15 @@ func main() {
 	// checkErr(err)
 
 	//store downlink message
-	dm := new(mdl.MessageDownLink)
-	dm.Deveui = "A4C12BF"
-	dm.Payload = "DOWNLINKMESSAGE"
-	dm.Time = time.Now()
-
-	log.Printf("Message: %+v", dm)
-	dmerror := dbc.StoreDownlinkMessage(dm)
-	checkErr(dmerror)
-	log.Printf("Message: %+v", dm)
+	// dm := new(mdl.MessageDownLink)
+	// dm.Deveui = "A4C12BF"
+	// dm.Payload = "DOWNLINKMESSAGE"
+	// dm.Time = time.Now()
+	//
+	// log.Printf("Message: %+v", dm)
+	// dmerror := dbc.StoreDownlinkMessage(dm)
+	// checkErr(dmerror)
+	// log.Printf("Message: %+v", dm)
 
 	//Adding a new message in the database
 	// message, err := dbc.AddMessage("A4C12BF")

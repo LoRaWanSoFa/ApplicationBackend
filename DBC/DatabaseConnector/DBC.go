@@ -13,12 +13,17 @@ import (
 )
 
 type DatabaseConnector struct {
-	Database                  *sql.DB
-	CheckDevEUISTMT           *sql.Stmt
-	GetNodeHeaderSTMT         *sql.Stmt
-	InsertMessageSTMT         *sql.Stmt
-	InsertPayloadSTMT         *sql.Stmt
-	InsertDownlinkMessageSTMT *sql.Stmt
+	Database                        *sql.DB
+	CheckDevEUISTMT                 *sql.Stmt
+	GetNodeHeaderSTMT               *sql.Stmt
+	InsertMessageSTMT               *sql.Stmt
+	InsertPayloadSTMT               *sql.Stmt
+	InsertDownlinkMessageSTMT       *sql.Stmt
+	GetFullHeaderSTMT               *sql.Stmt
+	ChangeSensorActivationStateSTMT *sql.Stmt
+	AddSensorTypeSTMT               *sql.Stmt
+	AddSensorSTMT                   *sql.Stmt
+	updateSensorOrderSTMT           *sql.Stmt
 }
 
 type WorkRequest struct {
@@ -91,6 +96,14 @@ func Connect() error {
 		"deveui, created_at, down) " +
 		"VALUES ($1, $2, true) " +
 		"RETURNING id;")
+	if err != nil {
+		return err
+	}
+	db.GetFullHeaderSTMT, err = db.Database.Prepare("select sensors.id, sensortypes.id, io_address, io_type, number_of_values, lenght_of_values, header_order, conversion_expression, description, data_type " +
+		"from sensors " +
+		"join public.sensortypes on sensors.sensortype_id = sensortypes.id " +
+		"where deveui =$1 " +
+		"order by soft_deleted, header_order;")
 	if err != nil {
 		return err
 	}
@@ -337,6 +350,56 @@ func GetNodeSensors(devEUI string) []mdl.Sensor {
 	}
 	sensors := workResult.Result.([]mdl.Sensor)
 	return sensors
+}
+
+//GetFullHeader returns all sensors connected to a node.
+func GetFullHeader(devEUI string) ([]mdl.Sensor, error) {
+	result := make(chan WorkResult)
+	defer close(result)
+	args := make([]interface{}, 1)
+	args[0] = devEUI
+
+	WorkQueue <- WorkRequest{Query: "", Arguments: args, ResultChannel: result, F: func(w *WorkRequest) {
+		rows, err := GetInstance().GetFullHeaderSTMT.Query(w.Arguments...)
+		defer rows.Close()
+		checkErr(err)
+		if err != nil {
+			w.ResultChannel <- WorkResult{Result: false, err: err}
+			return
+		}
+		sensors := make([]mdl.Sensor, 0)
+		var sid, stid int64
+		var io_address, io_type, number_of_values, lenght_of_values, header_order, data_type int
+		var conversion_expression, description string
+
+		for rows.Next() {
+			err = rows.Scan(&sid, &stid, &io_address, &io_type, &number_of_values, &lenght_of_values, &header_order, &conversion_expression, &description, &data_type)
+			if err != nil {
+				panic(err.Error())
+			}
+			s := mdl.NewSensor(
+				sid,
+				stid,
+				io_address,
+				io_type,
+				number_of_values,
+				lenght_of_values,
+				header_order,
+				data_type,
+				description,
+				conversion_expression)
+			sensors = append(sensors, s)
+		}
+		w.ResultChannel <- WorkResult{Result: sensors, err: err}
+	}}
+
+	var workResult = <-result
+	if workResult.err != nil {
+		log.Printf("A problem occured when getting the sensorheaders: %+v", workResult.err)
+		return make([]mdl.Sensor, 0), workResult.err
+	}
+	sensors := workResult.Result.([]mdl.Sensor)
+	return sensors, nil
 }
 
 func UpdateHeader(devEUI string, newheader []mdl.Sensor) error {
