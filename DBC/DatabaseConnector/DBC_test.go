@@ -155,6 +155,23 @@ func TestUpdateHeader(t *testing.T) {
 
 }
 
+func TestGetFullHeader(t *testing.T) {
+	sensors, err := GetFullHeader("")
+	if len(sensors) != 0 {
+		t.Errorf("Node \"\" has sensors!?: %+v", sensors)
+	}
+	if err != nil {
+		t.Errorf("Encountered no error: %+v", err)
+	}
+	sensors, err = GetFullHeader("A4C12BF")
+	if err != nil {
+		t.Errorf("Encountered an error: %+v", err)
+	}
+	if len(sensors) <= 0 {
+		t.Errorf("Node \"\" has no sensors?: %+v", sensors)
+	}
+}
+
 func TestPanic(t *testing.T) {
 	defer func() {
 		if r := recover(); r == nil {

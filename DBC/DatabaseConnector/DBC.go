@@ -103,7 +103,7 @@ func Connect() error {
 	if err != nil {
 		return err
 	}
-	db.getFullHeaderSTMT, err = db.Database.Prepare("select sensors.id, sensortypes.id, io_address, io_type, number_of_values, lenght_of_values, header_order, conversion_expression, description, data_type, soft_deleted " +
+	db.getFullHeaderSTMT, err = db.Database.Prepare("select sensors.id, sensortypes.id, io_address, io_type, number_of_values, lenght_of_values, header_order, conversion_expression, description, data_type, sensor_type, soft_deleted " +
 		"from sensors " +
 		"join public.sensortypes on sensors.sensortype_id = sensortypes.id " +
 		"where deveui =$1 " +
