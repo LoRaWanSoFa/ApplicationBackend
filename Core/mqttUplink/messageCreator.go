@@ -3,7 +3,6 @@ package mqttUplink
 import (
 	"errors"
 	"fmt"
-	"log"
 
 	components "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
 	"github.com/LoRaWanSoFa/LoRaWanSoFa/Core/ByteConverter"
@@ -11,7 +10,7 @@ import (
 )
 
 type MessageCreator interface {
-	CreateMessage(payload []byte, devEui []byte) (components.MessageUplinkI, error)
+	CreateMessage(payload []byte, devEui string) (components.MessageUplinkI, error)
 }
 
 type messageCreator struct {
@@ -30,20 +29,16 @@ func NewMessageCreator() MessageCreator {
 // Creates a MessageUplinkI object from the payload and devEui that were entered
 // as bytes. If there is no header found for the input devEui this method will
 // return an error.
-func (m *messageCreator) CreateMessage(payload []byte, devEui []byte) (components.MessageUplinkI, error) {
+func (m *messageCreator) CreateMessage(payload []byte, devEui string) (components.MessageUplinkI, error) {
 	var message components.MessageUplinkI
 	var sensors []components.Sensor
-	// Convert devEui from bytes into a hexadecimal representation of them as a string.
-	devEuiS, err := m.byteConverter.ConvertSingleValue(devEui, 4)
-	if err != nil {
-		log.Fatal(err)
-		return nil, err
-	}
-	sensors = DBC.GetNodeSensors(devEuiS)
+	var err error
+
+	sensors = DBC.GetNodeSensors(devEui)
 	if len(sensors) > 0 {
-		message, err = DBC.AddMessage(devEuiS)
+		message, err = DBC.AddMessage(devEui)
 	} else {
-		err = errors.New(fmt.Sprintf("There was no header received for %s", devEuiS))
+		err = errors.New(fmt.Sprintf("There was no header received for %s", devEui))
 		return nil, err
 	}
 
@@ -54,7 +49,7 @@ func (m *messageCreator) CreateMessage(payload []byte, devEui []byte) (component
 	} else {
 		err = errors.New(fmt.Sprintf("The existing header for %s is not of the "+
 			"right length for the received message. Header length was %d, while "+
-			"payload length was %d.", devEuiS, headerLength, len(payload[1:])))
+			"payload length was %d.", devEui, headerLength, len(payload[1:])))
 		return nil, err
 	}
 
