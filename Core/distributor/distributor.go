@@ -10,6 +10,8 @@ import (
 	"github.com/LoRaWanSoFa/LoRaWanSoFa/DBC/DatabaseConnector"
 )
 
+var logFatal = log.Fatal
+
 type Distributor interface {
 	InputUplink(components.MessageUplinkI) (components.MessageUplinkI, error)
 	InputDownlink(components.MessageDownLink)
@@ -33,7 +35,7 @@ func (d *distributor) InputUplink(message components.MessageUplinkI) (components
 		newMessage := d.convertMessage(message)
 		err := DatabaseConnector.StoreMessagePayloads(newMessage)
 		if err != nil {
-			log.Fatal(err)
+			logFatal(err)
 		}
 		d.restUplinkConnector.NewData(newMessage.GetDevEUI(), newMessage)
 		return newMessage, nil
@@ -65,7 +67,7 @@ func (d *distributor) convertMessage(message components.MessageUplinkI) componen
 			sensor := bytePayloads[i].GetSensor()
 			payloadS, err := d.byteConverter.ConvertSingleValue(payload, sensor.DataType)
 			if err != nil {
-				log.Fatal(err)
+				logFatal(err)
 			} else {
 				message.AddPayloadString(payloadS, sensor)
 			}
