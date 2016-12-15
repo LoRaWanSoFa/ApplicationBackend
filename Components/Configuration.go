@@ -35,17 +35,17 @@ var settings Configuration
 
 func GetConfiguration() Configuration {
 	once.Do(func() {
-		settings = ReloadConfig()
+		settings = ReloadConfig("/src/github.com/LoRaWanSoFa/LoRaWanSoFa/config.yaml")
 	})
 	return settings
 }
 
-func ReloadConfig() Configuration {
+func ReloadConfig(path string) Configuration {
 	// START: yaml config block
 	goPath := os.Getenv("GOPATH")
-	yamlFile, err := ioutil.ReadFile(filepath.Join(goPath, "/src/github.com/LoRaWanSoFa/LoRaWanSoFa/config.yaml"))
+	yamlFile, err := ioutil.ReadFile(filepath.Join(goPath, path))
 	if err != nil {
-		return settings
+		return Configuration{}
 	}
 	settings = Configuration{}
 	err = yaml.Unmarshal(yamlFile, &settings)
