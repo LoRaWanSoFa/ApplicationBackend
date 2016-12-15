@@ -3,12 +3,15 @@ package mqttUplink
 import (
 	"encoding/binary"
 	"errors"
+	"fmt"
 
 	components "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
+	"github.com/LoRaWanSoFa/LoRaWanSoFa/DBC/DatabaseConnector"
 )
 
 type HeaderHandler interface {
-	CreateNewHeader(payload []byte) ([]components.Sensor, error)
+	CreateNewHeader(payload []byte, devEUI string) ([]components.Sensor, error)
+	StoreHeader(header []components.Sensor, devEUI string) error
 }
 
 type headerHandler struct {
@@ -19,17 +22,27 @@ func NewHeaderHandler() HeaderHandler {
 	return h
 }
 
-func (h *headerHandler) CreateNewHeader(payload []byte) ([]components.Sensor, error) {
+func (h *headerHandler) CreateNewHeader(payload []byte, devEUI string) ([]components.Sensor, error) {
 	var sensors []components.Sensor
 	if h.checkLength(payload) {
 		for i := 1; i < len(payload); i = i + 3 {
-			sensors = append(sensors, h.createSensor(payload[i:i+3]))
+			sensor := h.createSensor(payload[i : i+3])
+			sensor.HeaderOrder = (i + 2) / 3
+			sensors = append(sensors, sensor)
 		}
 	} else {
 		err := errors.New("Header of unkown length was send.")
 		return nil, err
 	}
 	return sensors, nil
+}
+
+func (h *headerHandler) StoreHeader(sensor []components.Sensor, devEUI string) error {
+	oldHeader := DatabaseConnector.GetNodeSensors(devEUI) //TODO: DatabaseConnector.GetFullHeader()
+	for i := range oldHeader {
+		fmt.Println(i)
+	}
+	return nil
 }
 
 func (h *headerHandler) createSensor(payload []byte) components.Sensor {
@@ -57,6 +70,8 @@ func (h *headerHandler) createSensor(payload []byte) components.Sensor {
 	numberOfValues := payload[2]
 	numberOfValues = numberOfValues << 2 >> 5
 	sensor.NumberOfValues = int(numberOfValues)
+
+	sensor.Soft_deleted = false
 
 	return sensor
 }
