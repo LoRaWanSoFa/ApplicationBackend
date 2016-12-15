@@ -3,7 +3,6 @@ package mqttUplink
 import (
 	"encoding/binary"
 	"errors"
-	"fmt"
 
 	components "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
 	"github.com/LoRaWanSoFa/LoRaWanSoFa/DBC/DatabaseConnector"
@@ -74,7 +73,6 @@ func (h *headerHandler) StoreHeader(newHeader []components.Sensor, devEUI string
 
 func (h *headerHandler) containsSensor(sensor components.Sensor, sensors []components.Sensor) (bool, int) {
 	for i := range sensors {
-		fmt.Printf("%+v \n %+v \n", sensor, sensors[i])
 		if sensor.SameSensor(sensors[i]) {
 			return true, i
 		}
