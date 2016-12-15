@@ -16,7 +16,7 @@ var mc = NewMessageCreator()
 
 func TestMain(m *testing.M) {
 	DatabaseConnector.Connect()
-	message, _ = mc.CreateMessage(payload, devEuiB)
+	message, _ = mc.CreateMessage(payload, devEuiS)
 	result := m.Run()
 	DatabaseConnector.Close()
 	os.Exit(result)
@@ -30,8 +30,8 @@ func TestAddSimpleMessage(t *testing.T) {
 }
 
 func TestCheckPayloads(t *testing.T) {
-	gpsSensor := components.NewSensor(3, 0, 0, 0, 2, 4, 1, 2, "", "0")
-	boolSensor := components.NewSensor(4, 0, 0, 0, 1, 1, 2, 5, "", "0")
+	gpsSensor := components.NewSensor(3, 0, 0, 0, 2, 4, 1, 2, "", "0", false)
+	boolSensor := components.NewSensor(4, 0, 0, 0, 1, 1, 2, 5, "", "0", false)
 	expectedMessage := components.NewMessageUplink(123, devEuiS)
 	expectedMessage.AddPayload([]byte{0x42, 0x22, 0xEC, 0x25}, gpsSensor)
 	expectedMessage.AddPayload([]byte{0xC2, 0x93, 0xDE, 0xD8}, gpsSensor)
@@ -48,7 +48,7 @@ func TestCheckPayloads(t *testing.T) {
 }
 
 func TestNoHeader(t *testing.T) {
-	devEuiNoSensor := []byte{0x00, 0x00, 0x00, 0x00, 0xAF, 0x12, 0x94, 0xE5}
+	devEuiNoSensor := "00000000AF1294E5"
 	_, err := mc.CreateMessage(payload, devEuiNoSensor)
 	if err == nil {
 		t.Errorf("The node should not have a header, and throw an error %+v", err)

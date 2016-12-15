@@ -9,13 +9,13 @@ import (
 var h = NewHeaderHandler()
 var headerPayload = []byte{0x10, 0x00, 0x4F, 0x08, 0x00, 0x65, 0x20, 0x0C, 0x4F, 0x08}
 var expectedSensors = []components.Sensor{
-	components.Sensor{IoType: 0, IoAddress: 0, SensorType: 79, LenghtOfValues: 1, NumberOfValues: 1},
-	components.Sensor{IoType: 0, IoAddress: 0, SensorType: 101, LenghtOfValues: 1, NumberOfValues: 4},
-	components.Sensor{IoType: 0, IoAddress: 3, SensorType: 79, LenghtOfValues: 1, NumberOfValues: 1},
+	components.Sensor{IoType: 0, IoAddress: 0, SensorType: 79, LenghtOfValues: 1, NumberOfValues: 1, HeaderOrder: 1},
+	components.Sensor{IoType: 0, IoAddress: 0, SensorType: 101, LenghtOfValues: 1, NumberOfValues: 4, HeaderOrder: 2},
+	components.Sensor{IoType: 0, IoAddress: 3, SensorType: 79, LenghtOfValues: 1, NumberOfValues: 1, HeaderOrder: 3},
 }
 
 func TestCreateNewHeader(t *testing.T) {
-	sensors, _ := h.CreateNewHeader(headerPayload)
+	sensors, _ := h.CreateNewHeader(headerPayload, "")
 	if len(expectedSensors) != len(sensors) {
 		t.Errorf("Expected the header to have %d sensors, but had %d.",
 			len(expectedSensors), len(sensors))
@@ -30,7 +30,7 @@ func TestCreateNewHeader(t *testing.T) {
 
 func TestHeaderWithWrongLength(t *testing.T) {
 	wrongLengthPayload := []byte{0x10, 0x00}
-	_, err := h.CreateNewHeader(wrongLengthPayload)
+	_, err := h.CreateNewHeader(wrongLengthPayload, "")
 	if err == nil {
 		t.Errorf("Payload with %d, should generate an error in the header handler", len(wrongLengthPayload))
 	}

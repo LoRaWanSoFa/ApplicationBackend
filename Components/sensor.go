@@ -44,3 +44,12 @@ func NewSensor(
 		HeaderOrder: header_order, Description: description,
 		Conversion_expression: conversion_expression, DataType: data_type, Soft_deleted: soft_deleted}
 }
+
+func (s *Sensor) SameSensor(otherSensor Sensor) bool {
+	b := (s.IoType == otherSensor.IoType)
+	b = b && (s.IoAddress == otherSensor.IoAddress)
+	b = b && (s.SensorType == otherSensor.SensorType)
+	b = b && (s.LenghtOfValues == otherSensor.LenghtOfValues)
+	b = b && (s.NumberOfValues == otherSensor.NumberOfValues)
+	return b
+}
