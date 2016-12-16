@@ -22,6 +22,7 @@ type distributor struct {
 	restUplinkConnector restUplink.RestUplinkConnector
 }
 
+// Creates a new Distributor object.
 func New() Distributor {
 	dist := new(distributor)
 	dist.byteConverter = byteConverter.New()
@@ -30,6 +31,8 @@ func New() Distributor {
 	return dist
 }
 
+// Receives an Uplink message and distributes the message to the parts of the
+// application that need to receive it.
 func (d *distributor) InputUplink(message components.MessageUplinkI) (components.MessageUplinkI, error) {
 	if d.deduplicate(message) {
 		newMessage := d.convertMessage(message)
@@ -45,6 +48,8 @@ func (d *distributor) InputUplink(message components.MessageUplinkI) (components
 	}
 }
 
+// Receives a Downlink message and distributes the message to the parts of the
+// application that need to receive it.
 func (d *distributor) InputDownlink(message components.MessageDownLink) {
 
 }
@@ -58,6 +63,7 @@ func (d *distributor) deduplicate(message components.MessageUplinkI) bool {
 	return true
 }
 
+// Converts a message payload from bytes to string.
 func (d *distributor) convertMessage(message components.MessageUplinkI) components.MessageUplinkI {
 	bytePayloads := message.GetPayloads()
 	message.RemovePayloads()
