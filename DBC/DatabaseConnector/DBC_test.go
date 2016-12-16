@@ -172,53 +172,26 @@ func TestGetFullHeader(t *testing.T) {
 	}
 }
 
-func TestSingleChangeSensorActivationState(t *testing.T) {
-	//Setup sensor
-	sensors, err := GetFullHeader("A4C12BF")
-	sensor := sensors[0]
-	sensor.Soft_deleted = false
-	changeSensorActivationState(sensor)
-	//check if it is correct
-	sensors, err = GetFullHeader("A4C12BF")
-	sensor = sensors[0]
-	if sensor.Soft_deleted != false || err != nil {
-		t.Errorf("Should not be soft deleted! \n %+v", err)
+func TestChangeSensorActivationState(t *testing.T) {
+	sens, err := GetFullHeader("A4C12BF")
+	for i := range sens {
+		sens[i].Soft_deleted = false
 	}
-	//change state and check again
-	sensor.Soft_deleted = true
-	changeSensorActivationState(sensor)
-	//check if it is correct
-	sensors, err = GetFullHeader("A4C12BF")
-	sensor = sensors[1]
-	if sensor.Soft_deleted != true || err != nil {
-		t.Errorf("Should be soft deleted! \n %+v", err)
+	ChangeSensorActivationState(sens)
+	sensorStateHelperTest(t, sens[0].Id, false, err)
+
+}
+
+func sensorStateHelperTest(t *testing.T, id int64, expectedstate bool, err error) {
+	if err != nil {
+		t.Error("query failed")
 	}
-	//TEST the array parameter function!
-	//Setup sensor
-	sensors, err = GetFullHeader("A4C12BF")
-	for i := range sensors {
-		sensors[i].Soft_deleted = false
+	var res bool
+	err = GetInstance().Database.QueryRow("select soft_deleted from sensors where id=$1", id).Scan(&res)
+	if res != expectedstate {
+		t.Errorf("Softdelete with id: %+v should be %+v but was %+v.\n %+v", id, expectedstate, res, err)
 	}
-	t.Logf("sensors: %+v", sensors)
-	ChangeSensorActivationState(sensors)
-	//check if it is correct
-	sensors, err = GetFullHeader("A4C12BF")
-	t.Logf("sensors: %+v", sensors)
-	for i := range sensors {
-		if sensors[i].Soft_deleted != false || err != nil {
-			t.Errorf("Should not be soft deleted! \n %+v", err)
-		}
-		//change state
-		sensors[i].Soft_deleted = true
-	}
-	ChangeSensorActivationState(sensors)
-	//check if it is correct
-	sensors, err = GetFullHeader("A4C12BF")
-	for i := range sensors {
-		if sensors[i].Soft_deleted != true || err != nil {
-			t.Errorf("Should be soft deleted! \n %+v", err)
-		}
-	}
+
 }
 
 func TestPanic(t *testing.T) {

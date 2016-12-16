@@ -446,7 +446,7 @@ func getSensorTypeId(sensorType int) (int64, error) {
 
 func ChangeSensorActivationState(sensors []mdl.Sensor) {
 	for _, sensor := range sensors {
-		changeSensorActivationState(sensor)
+		ChangeSingleSensorActivationState(sensor)
 	}
 }
 
@@ -493,7 +493,7 @@ func UpdateHeader(devEUI string, newheader []mdl.Sensor) error {
 	return nil
 }
 
-func changeSensorActivationState(sensor mdl.Sensor) {
+func ChangeSingleSensorActivationState(sensor mdl.Sensor) {
 	args := make([]interface{}, 2)
 	log.Printf("deleted: %+v", sensor.Soft_deleted)
 	args[0] = sensor.Soft_deleted
