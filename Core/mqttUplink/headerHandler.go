@@ -71,7 +71,7 @@ func (h *headerHandler) StoreHeader(newHeader []components.Sensor, devEUI string
 		//TODO: DatabaseConnector.NewSensor(newHeader)
 	}
 	if len(activationChanged) != 0 {
-		//TODO: DatabaseConnector.ChangeSensorActivationStates(activationChanged)
+		DatabaseConnector.ChangeSensorActivationState(activationChanged)
 	}
 	if len(headerOrderChanges) != 0 {
 		//TODO: DatabaseConnector.ChangeSensorOrder(headerOrderChanges)
