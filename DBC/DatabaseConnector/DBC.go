@@ -115,6 +115,10 @@ func Connect() error {
 	if err != nil {
 		return err
 	}
+	db.changeSensorActivationStateSTMT, err = db.Database.Prepare("update sensors set soft_deleted=$1 where id=$2")
+	if err != nil {
+		return err
+	}
 	db.insertPayloadSTMT, err = db.Database.Prepare("INSERT INTO public.message_payloads(" +
 		"message_id, sensor_id, payload) " +
 		"VALUES ($1, $2, $3);")
@@ -440,6 +444,12 @@ func getSensorTypeId(sensorType int) (int64, error) {
 	return workResult.Result.(int64), workResult.err
 }
 
+func ChangeSensorActivationState(sensors []mdl.Sensor) {
+	for _, sensor := range sensors {
+		changeSensorActivationState(sensor)
+	}
+}
+
 func UpdateHeader(devEUI string, newheader []mdl.Sensor) error {
 	//check first
 	if len(newheader) == 0 {
@@ -481,6 +491,19 @@ func UpdateHeader(devEUI string, newheader []mdl.Sensor) error {
 	//Query: insert new sensors with Deveui
 
 	return nil
+}
+
+func changeSensorActivationState(sensor mdl.Sensor) {
+	args := make([]interface{}, 2)
+	log.Printf("deleted: %+v", sensor.Soft_deleted)
+	args[0] = sensor.Soft_deleted
+	args[1] = sensor.Id
+	WorkQueue <- WorkRequest{Query: "", Arguments: args, ResultChannel: nil, F: func(w *WorkRequest) {
+		_, err := GetInstance().changeSensorActivationStateSTMT.Exec(args...)
+		if err != nil {
+			log.Printf("Could not change the sensor state!\n %+v", err)
+		}
+	}}
 }
 
 func isOffline() bool {
