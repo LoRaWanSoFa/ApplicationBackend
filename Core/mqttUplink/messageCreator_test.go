@@ -18,11 +18,14 @@ var expectedSensors []components.Sensor
 var errs []string
 
 func TestMain(m *testing.M) {
-	setUp()
-	DatabaseConnector.Connect()
-	message, _ = mc.CreateMessage(payload, devEuiS)
-	result := m.Run()
-	DatabaseConnector.Close()
+	result := 0
+	err := DatabaseConnector.Connect()
+	if err == nil {
+		setUp()
+		message, _ = mc.CreateMessage(payload, devEuiS)
+		result = m.Run()
+		DatabaseConnector.Close()
+	}
 	os.Exit(result)
 }
 
