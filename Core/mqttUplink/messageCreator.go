@@ -56,6 +56,8 @@ func (m *messageCreator) CreateMessage(payload []byte, devEui string) (component
 	return message, nil
 }
 
+// Adds the payloads to a message, payloads are sliced to the expected length that is
+// defined in the header.
 func (m *messageCreator) addPayloads(payload []byte, message *components.MessageUplinkI, sensors []components.Sensor) {
 	for i := range sensors {
 		LoV := sensors[i].LenghtOfValues
@@ -67,6 +69,8 @@ func (m *messageCreator) addPayloads(payload []byte, message *components.Message
 	}
 }
 
+// Method to check if the received payload is of the expected length found in the
+// header.
 func (m *messageCreator) checkPayloadLength(payload []byte, sensors []components.Sensor) (bool, int) {
 	length := 0
 	for i := range sensors {

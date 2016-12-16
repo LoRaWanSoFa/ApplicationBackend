@@ -1,6 +1,7 @@
 package mqttUplink
 
 import (
+	"fmt"
 	"os"
 	"testing"
 
@@ -13,15 +14,31 @@ var devEuiS = "00000000ABCDEF12"
 var payload = []byte{0x20, 0x42, 0x22, 0xEC, 0x25, 0xC2, 0x93, 0xDE, 0xD8, 0x01}
 var message components.MessageUplinkI
 var mc = NewMessageCreator()
+var expectedSensors []components.Sensor
+var errs []string
 
 func TestMain(m *testing.M) {
-	setUp()
-	DatabaseConnector.Connect()
-	message, _ = mc.CreateMessage(payload, devEuiS)
-	result := m.Run()
-	DatabaseConnector.Close()
+	result := 0
+	err := DatabaseConnector.Connect()
+	if err == nil {
+		setUp()
+		message, _ = mc.CreateMessage(payload, devEuiS)
+		result = m.Run()
+		DatabaseConnector.Close()
+	}
 	os.Exit(result)
+}
 
+func setUp() {
+	errs = []string{}
+	logFatal = func(args ...interface{}) {
+		errs = append(errs, fmt.Sprintf("%+v", args))
+	}
+	expectedSensors = []components.Sensor{
+		components.Sensor{IoType: 0, IoAddress: 0, SensorType: 79, LenghtOfValues: 1, NumberOfValues: 1, HeaderOrder: 1},
+		components.Sensor{IoType: 0, IoAddress: 0, SensorType: 101, LenghtOfValues: 1, NumberOfValues: 4, HeaderOrder: 2},
+		components.Sensor{IoType: 0, IoAddress: 3, SensorType: 79, LenghtOfValues: 1, NumberOfValues: 1, HeaderOrder: 3},
+	}
 }
 
 func TestAddSimpleMessage(t *testing.T) {
