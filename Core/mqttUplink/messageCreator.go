@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	components "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
-	"github.com/LoRaWanSoFa/LoRaWanSoFa/Core/ByteConverter"
 	DBC "github.com/LoRaWanSoFa/LoRaWanSoFa/DBC/DatabaseConnector"
 )
 
@@ -14,7 +13,6 @@ type MessageCreator interface {
 }
 
 type messageCreator struct {
-	byteConverter byteConverter.ByteConverter
 }
 
 // A messageCreator is created, the purpose of the MessageCreator is to
@@ -22,7 +20,6 @@ type messageCreator struct {
 // to the MessageUplinkI format for further use.
 func NewMessageCreator() MessageCreator {
 	mc := new(messageCreator)
-	mc.byteConverter = byteConverter.New()
 	return mc
 }
 
