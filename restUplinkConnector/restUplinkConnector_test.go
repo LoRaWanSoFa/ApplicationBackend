@@ -8,7 +8,7 @@ import (
 	"os"
 	"testing"
 
-	components "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
+	components "github.com/LoRaWanSoFa/ApplicationBackend/Components"
 )
 
 var testMessage = components.NewMessageUplink(123, "1234")

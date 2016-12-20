@@ -5,8 +5,8 @@ import (
 	"os"
 	"testing"
 
-	components "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
-	"github.com/LoRaWanSoFa/LoRaWanSoFa/DBC/DatabaseConnector"
+	components "github.com/LoRaWanSoFa/ApplicationBackend/Components"
+	"github.com/LoRaWanSoFa/ApplicationBackend/DBC/DatabaseConnector"
 )
 
 var devEuiB = []byte{0x00, 0x00, 0x00, 0x00, 0xAB, 0xCD, 0xEF, 0x12}

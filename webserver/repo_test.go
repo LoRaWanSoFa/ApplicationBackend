@@ -3,7 +3,7 @@ package webserver
 import (
 	"testing"
 
-	components "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
+	components "github.com/LoRaWanSoFa/ApplicationBackend/Components"
 )
 
 func TestRepoFindMessage(t *testing.T) {

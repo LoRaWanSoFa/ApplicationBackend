@@ -1,7 +1,7 @@
 package webserver
 
 import "fmt"
-import components "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
+import components "github.com/LoRaWanSoFa/ApplicationBackend/Components"
 
 var currentID int64
 

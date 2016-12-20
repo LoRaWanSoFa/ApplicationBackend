@@ -4,7 +4,7 @@ import (
 	"errors"
 	"os"
 
-	components "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
+	components "github.com/LoRaWanSoFa/ApplicationBackend/Components"
 	"github.com/LoRaWanSoFa/ttn/core"
 	"github.com/LoRaWanSoFa/ttn/core/types"
 	"github.com/LoRaWanSoFa/ttn/mqtt"

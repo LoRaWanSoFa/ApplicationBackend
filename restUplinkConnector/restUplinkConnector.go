@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	components "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
+	components "github.com/LoRaWanSoFa/ApplicationBackend/Components"
 )
 
 // Connector is the client that connects to the Rest API

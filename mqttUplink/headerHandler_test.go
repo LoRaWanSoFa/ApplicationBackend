@@ -3,7 +3,7 @@ package mqttUplink
 import (
 	"testing"
 
-	components "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
+	components "github.com/LoRaWanSoFa/ApplicationBackend/Components"
 )
 
 var h = NewHeaderHandler()

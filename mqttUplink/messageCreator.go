@@ -3,8 +3,8 @@ package mqttUplink
 import (
 	"fmt"
 
-	components "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
-	DBC "github.com/LoRaWanSoFa/LoRaWanSoFa/DBC/DatabaseConnector"
+	components "github.com/LoRaWanSoFa/ApplicationBackend/Components"
+	DBC "github.com/LoRaWanSoFa/ApplicationBackend/DBC/DatabaseConnector"
 )
 
 // MessageCreator is a Helper interface that creates a MessageUplinkI type from

@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	components "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
-	"github.com/LoRaWanSoFa/LoRaWanSoFa/distributor"
+	components "github.com/LoRaWanSoFa/ApplicationBackend/Components"
+	"github.com/LoRaWanSoFa/ApplicationBackend/distributor"
 	"github.com/LoRaWanSoFa/ttn/core"
 	"github.com/LoRaWanSoFa/ttn/core/types"
 )

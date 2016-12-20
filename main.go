@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/LoRaWanSoFa/LoRaWanSoFa/webserver"
+	"github.com/LoRaWanSoFa/ApplicationBackend/webserver"
 )
 
 func main() {

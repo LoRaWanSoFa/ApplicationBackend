@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"strconv"
 
-	components "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
-	dist "github.com/LoRaWanSoFa/LoRaWanSoFa/distributor"
+	components "github.com/LoRaWanSoFa/ApplicationBackend/Components"
+	dist "github.com/LoRaWanSoFa/ApplicationBackend/distributor"
 	"github.com/gorilla/mux"
 )
 

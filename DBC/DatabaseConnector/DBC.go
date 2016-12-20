@@ -11,7 +11,7 @@ import (
 	"sync"
 	"time"
 
-	mdl "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
+	mdl "github.com/LoRaWanSoFa/ApplicationBackend/Components"
 	//Postgress database/sql implementation
 	_ "github.com/lib/pq"
 )

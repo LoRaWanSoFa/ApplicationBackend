@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	mdl "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
+	mdl "github.com/LoRaWanSoFa/ApplicationBackend/Components"
 	_ "github.com/lib/pq"
 )
 

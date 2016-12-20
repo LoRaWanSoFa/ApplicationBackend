@@ -5,11 +5,11 @@ import (
 	"log"
 	"strconv"
 
-	components "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
-	"github.com/LoRaWanSoFa/LoRaWanSoFa/ByteConverter"
-	"github.com/LoRaWanSoFa/LoRaWanSoFa/mqttDownlink"
-	"github.com/LoRaWanSoFa/LoRaWanSoFa/restUplinkConnector"
-	"github.com/LoRaWanSoFa/LoRaWanSoFa/DBC/DatabaseConnector"
+	components "github.com/LoRaWanSoFa/ApplicationBackend/Components"
+	"github.com/LoRaWanSoFa/ApplicationBackend/ByteConverter"
+	"github.com/LoRaWanSoFa/ApplicationBackend/mqttDownlink"
+	"github.com/LoRaWanSoFa/ApplicationBackend/restUplinkConnector"
+	"github.com/LoRaWanSoFa/ApplicationBackend/DBC/DatabaseConnector"
 )
 
 var logFatal = log.Fatal

@@ -40,7 +40,7 @@ var settings Configuration
 // not set it to the standard path.
 func GetConfiguration() Configuration {
 	once.Do(func() {
-		settings = ReloadConfig("/src/github.com/LoRaWanSoFa/LoRaWanSoFa/config.yaml")
+		settings = ReloadConfig("/src/github.com/LoRaWanSoFa/ApplicationBackend/config.yaml")
 	})
 	return settings
 }

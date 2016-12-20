@@ -4,8 +4,8 @@ import (
 	"encoding/binary"
 	"errors"
 
-	components "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
-	"github.com/LoRaWanSoFa/LoRaWanSoFa/DBC/DatabaseConnector"
+	components "github.com/LoRaWanSoFa/ApplicationBackend/Components"
+	"github.com/LoRaWanSoFa/ApplicationBackend/DBC/DatabaseConnector"
 )
 
 // HeaderHandler is a Helper interface that creates and stores a header.

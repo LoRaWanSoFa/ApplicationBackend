@@ -4,12 +4,12 @@ import (
 	"log"
 	"time"
 
-	mdl "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
-	dbc "github.com/LoRaWanSoFa/LoRaWanSoFa/DBC/DatabaseConnector"
+	mdl "github.com/LoRaWanSoFa/ApplicationBackend/Components"
+	dbc "github.com/LoRaWanSoFa/ApplicationBackend/DBC/DatabaseConnector"
 	_ "github.com/lib/pq"
 )
 
-//mdl "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
+//mdl "github.com/LoRaWanSoFa/ApplicationBackend/Components"
 
 func main() {
 	errPing := dbc.Connect()
