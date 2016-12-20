@@ -24,9 +24,9 @@ func stopWorker() bool {
 
 func stopDispatcher() {
 	defer close(workers)
+	stop = true
 	for stopWorker() {
 	}
-	stop = true
 }
 
 func startDispatcher(nworkers int) {
