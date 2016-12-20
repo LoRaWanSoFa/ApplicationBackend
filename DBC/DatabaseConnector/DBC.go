@@ -171,7 +171,7 @@ func CheckDevEUI(devEUI string) bool {
 	var workResult = <-result
 	checkErr(workResult.err)
 	exists := workResult.Result.(bool)
-	log.Printf("Work done for Q:%s A:%t\n", devEUI, exists)
+	//log.Printf("Work done for Q:%s A:%t\n", devEUI, exists)
 	return exists
 }
 
@@ -475,7 +475,7 @@ func ChangeSensorActivationState(sensors []mdl.Sensor) {
 //ChangeSingleSensorActivationState sets the softdelete state in the database.
 func ChangeSingleSensorActivationState(sensor mdl.Sensor) {
 	args := make([]interface{}, 2)
-	log.Printf("deleted: %+v", sensor.SoftDeleted)
+	//log.Printf("deleted: %+v", sensor.SoftDeleted)
 	args[0] = sensor.SoftDeleted
 	args[1] = sensor.ID
 	WorkQueue <- WorkRequest{Query: "", Arguments: args, ResultChannel: nil, F: func(w *WorkRequest) {
