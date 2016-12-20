@@ -9,7 +9,7 @@ import (
 	"strconv"
 
 	components "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
-	dist "github.com/LoRaWanSoFa/LoRaWanSoFa/Core/distributor"
+	dist "github.com/LoRaWanSoFa/LoRaWanSoFa/distributor"
 	"github.com/gorilla/mux"
 )
 

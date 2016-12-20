@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
-	"github.com/LoRaWanSoFa/LoRaWanSoFa/Core/distributor"
+	"github.com/LoRaWanSoFa/LoRaWanSoFa/distributor"
 	"github.com/LoRaWanSoFa/ttn/core"
 	"github.com/LoRaWanSoFa/ttn/core/types"
 	"github.com/LoRaWanSoFa/ttn/mqtt"

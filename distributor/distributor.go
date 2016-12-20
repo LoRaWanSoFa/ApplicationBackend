@@ -6,9 +6,9 @@ import (
 	"strconv"
 
 	components "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
-	"github.com/LoRaWanSoFa/LoRaWanSoFa/Core/ByteConverter"
-	"github.com/LoRaWanSoFa/LoRaWanSoFa/Core/mqttDownlink"
-	"github.com/LoRaWanSoFa/LoRaWanSoFa/Core/restUplinkConnector"
+	"github.com/LoRaWanSoFa/LoRaWanSoFa/ByteConverter"
+	"github.com/LoRaWanSoFa/LoRaWanSoFa/mqttDownlink"
+	"github.com/LoRaWanSoFa/LoRaWanSoFa/restUplinkConnector"
 	"github.com/LoRaWanSoFa/LoRaWanSoFa/DBC/DatabaseConnector"
 )
 
