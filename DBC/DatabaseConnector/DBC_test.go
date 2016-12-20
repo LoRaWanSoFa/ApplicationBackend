@@ -72,7 +72,7 @@ func TestStoreMessagePayloads(t *testing.T) {
 	if err.Error() != "nil given as message parameter" {
 		t.Errorf("Did not catch nil exception")
 	}
-	m = new(mdl.MessageUplink)
+	m = mdl.NewMessageUplink(0, "")
 	err = StoreMessagePayloads(m)
 	if err.Error() != "Message has not been initalized/stored" {
 		t.Errorf("Works without an message id")
@@ -100,12 +100,12 @@ func TestStoreMessagePayloads(t *testing.T) {
 func TestStoreDownlinkMessage(t *testing.T) {
 	dm := new(mdl.MessageDownLink)
 
-	dm.Id = 1
+	dm.ID = 1
 	dmerror := StoreDownlinkMessage(dm)
 	if dmerror.Error() != "Message already has an id, can not insert it" {
 		t.Errorf("Allowed an already proccesed message to be stored again; %+v", dmerror)
 	}
-	dm.Id = 0
+	dm.ID = 0
 	dmerror = StoreDownlinkMessage(dm)
 	if dmerror.Error() != "Message has an empty payload" {
 		t.Errorf("Allowed a message to be stored without a payload; %+v", dmerror)
@@ -121,7 +121,7 @@ func TestStoreDownlinkMessage(t *testing.T) {
 	if dmerror != nil {
 		t.Errorf("Could not store downlink message: %+v", dmerror)
 	}
-	if dm.Id == 0 {
+	if dm.ID == 0 {
 		t.Error("Downlink message ID should be setted")
 	}
 	if dm.Time.IsZero() {

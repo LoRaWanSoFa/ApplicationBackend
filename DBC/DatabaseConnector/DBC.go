@@ -218,7 +218,7 @@ func StoreMessagePayloads(message mdl.MessageUplinkI) error {
 	if message == nil {
 		return errors.New("nil given as message parameter")
 	}
-	if message.GetId() == 0 {
+	if message.GetID() == 0 {
 		return errors.New("Message has not been initalized/stored")
 	}
 	payloads := message.GetPayloads()
@@ -229,7 +229,7 @@ func StoreMessagePayloads(message mdl.MessageUplinkI) error {
 	var err error
 	for _, payload := range payloads {
 		parameters = make([]interface{}, 0)
-		parameters = append(parameters, message.GetId())               //message id
+		parameters = append(parameters, message.GetID())               //message id
 		parameters = append(parameters, payload.GetSensor().ID)        //sensor id
 		parameters = append(parameters, payload.GetPayload().(string)) //payload
 		//log.Printf("parameters: %+v", parameters)
@@ -272,7 +272,7 @@ func insertPayload(parameters []interface{}) error {
 //StoreDownlinkMessage Stores a DownlinkMessage which has an id,payload and deveui set.
 //if no time is set NOW() will be used
 func StoreDownlinkMessage(message *mdl.MessageDownLink) error {
-	if message.Id != 0 {
+	if message.ID != 0 {
 		return errors.New("Message already has an id, can not insert it")
 	}
 	if message.Payload == "" {
@@ -289,7 +289,7 @@ func StoreDownlinkMessage(message *mdl.MessageDownLink) error {
 		return err
 	}
 	var parameters []interface{}
-	parameters = append(parameters, message.Id)
+	parameters = append(parameters, message.ID)
 	parameters = append(parameters, nil)
 	parameters = append(parameters, message.Payload)
 	err = insertPayload(parameters)
@@ -332,7 +332,7 @@ func addDownlinkMessage(message *mdl.MessageDownLink) error {
 		log.Println("Worker could finnish its work properly")
 		return response.err
 	}
-	message.Id = response.Result.(int64)
+	message.ID = response.Result.(int64)
 
 	return response.err
 }

@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	components "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
-	"github.com/LoRaWanSoFa/LoRaWanSoFa/Core/distributor"
+	"github.com/LoRaWanSoFa/LoRaWanSoFa/distributor"
 	"github.com/LoRaWanSoFa/ttn/core"
 	"github.com/LoRaWanSoFa/ttn/core/types"
 )
@@ -26,6 +26,10 @@ func (m *mockDistributor) InputUplink(message components.MessageUplinkI) (compon
 }
 
 func (m *mockDistributor) InputDownlink(message components.MessageDownLink) {
+}
+func (m *mockDistributor) InputNewSensors(sensors []components.Sensor, devEUI string) {
+}
+func (m *mockDistributor) DeleteSensors(sensors []components.Sensor, devEUI string) {
 }
 
 func TestUplinkMessageHandler(t *testing.T) {

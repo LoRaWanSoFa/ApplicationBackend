@@ -6,71 +6,79 @@ import (
 	"time"
 )
 
+// MessageUplinkI is used to handle uplink messages more efficiently.
+// It gives methods that help handling and displaying the message.
 type MessageUplinkI interface {
 	AddPayload(p []byte, s Sensor)
+	AddPayloadString(str string, s Sensor)
 	GetPayloads() []messagePayloadI
-	GetId() int64
+	GetID() int64
 	GetDevEUI() string
 	RemovePayloads()
-	AddPayloadString(str string, s Sensor)
-	ToJson() url.Values
+	ToJSON() url.Values
 }
 
-type MessageUplink struct {
-	Id       int64 //database id
+type messageUplink struct {
+	ID       int64 //database id
 	Time     string
 	DevEUI   string // or [8]byte or types.DevEUI
 	Payloads []messagePayloadI
 }
 
+// MessageDownLink is used for Downlink messages and is created by the webserver
+// via restful JSON.
 type MessageDownLink struct {
-	Id      int64     `json:"id"`
+	ID      int64     `json:"id"`
 	Deveui  string    `json:"deveui"`
 	Payload string    `json:"payload"`
 	Time    time.Time `json:"time"`
 }
 
+// Messages is a Slice of messages of type MessageDownLink, is used to bundle
+// Downlink Messages in webserver.
 type Messages []MessageDownLink
 
+// NewMessageUplink is the constructor for the MessageUplinkI interface.
 func NewMessageUplink(id int64, devEUI string) MessageUplinkI {
-	message := new(MessageUplink)
-	message.Id = id
+	message := new(messageUplink)
+	message.ID = id
 	message.DevEUI = devEUI
 	message.Payloads = make([]messagePayloadI, 0)
 	return message
 }
 
-func (m *MessageUplink) AddPayload(p []byte, s Sensor) {
+func (m *messageUplink) AddPayload(p []byte, s Sensor) {
 	mp := new(messagePayloadByte)
 	mp.Payload = p
 	mp.Sensor = s
 	m.Payloads = append(m.Payloads, mp)
 }
 
-func (m *MessageUplink) AddPayloadString(str string, s Sensor) {
+func (m *messageUplink) AddPayloadString(str string, s Sensor) {
 	mp := new(messagePayloadString)
 	mp.Payload = str
 	mp.Sensor = s
 	m.Payloads = append(m.Payloads, mp)
 }
 
-func (m *MessageUplink) RemovePayloads() {
+func (m *messageUplink) RemovePayloads() {
 	m.Payloads = make([]messagePayloadI, 0)
 }
 
-func (m *MessageUplink) GetPayloads() []messagePayloadI {
+func (m *messageUplink) GetPayloads() []messagePayloadI {
 	return m.Payloads
 }
 
-func (m *MessageUplink) GetId() int64 {
-	return m.Id
+func (m *messageUplink) GetID() int64 {
+	return m.ID
 }
 
-func (m *MessageUplink) GetDevEUI() string {
+func (m *messageUplink) GetDevEUI() string {
 	return m.DevEUI
 }
 
-func (m *MessageUplink) ToJson() url.Values {
+// ToJSON creates a json object from the MessageUplinkI Interface.
+func (m *messageUplink) ToJSON() url.Values {
 	json := url.Values{}
 	payloads := m.GetPayloads()
 	for i := range payloads {

@@ -1,8 +1,8 @@
 package components
 
 type messagePayloadI interface {
-	GetId() int64
-	SetId(id int64)
+	GetID() int64
+	SetID(id int64)
 	GetPayload() interface{}
 	SetPayload(data interface{})
 	GetSensor() Sensor
@@ -11,25 +11,25 @@ type messagePayloadI interface {
 }
 
 type messagePayloadByte struct {
-	Id      int64
+	ID      int64
 	Payload []byte
 	Sensor  Sensor
 }
 
 type messagePayloadString struct {
-	Id      int64
+	ID      int64
 	Payload string
 	Sensor  Sensor
 }
 
 //messagePayloadByte
 
-func (mpb *messagePayloadByte) GetId() int64 {
-	return mpb.Id
+func (mpb *messagePayloadByte) GetID() int64 {
+	return mpb.ID
 }
 
-func (mpb *messagePayloadByte) SetId(id int64) {
-	mpb.Id = id
+func (mpb *messagePayloadByte) SetID(id int64) {
+	mpb.ID = id
 }
 
 func (mpb *messagePayloadByte) GetPayload() interface{} {
@@ -54,7 +54,7 @@ func (mpb *messagePayloadByte) SetSensor(s Sensor) {
 }
 
 func (mpb *messagePayloadByte) Equals(mpi messagePayloadI) bool {
-	if mpb.Id != mpi.GetId() {
+	if mpb.ID != mpi.GetID() {
 		return false
 	}
 	otherPayload, ok := mpi.GetPayload().([]byte)
@@ -80,12 +80,12 @@ func (mpb *messagePayloadByte) Equals(mpi messagePayloadI) bool {
 
 //messagePayloadString
 
-func (mps *messagePayloadString) GetId() int64 {
-	return mps.Id
+func (mps *messagePayloadString) GetID() int64 {
+	return mps.ID
 }
 
-func (mps *messagePayloadString) SetId(id int64) {
-	mps.Id = id
+func (mps *messagePayloadString) SetID(id int64) {
+	mps.ID = id
 }
 
 func (mps *messagePayloadString) GetPayload() interface{} {
@@ -110,7 +110,7 @@ func (mps *messagePayloadString) SetSensor(s Sensor) {
 }
 
 func (mps *messagePayloadString) Equals(mpi messagePayloadI) bool {
-	if mps.Id != mpi.GetId() {
+	if mps.ID != mpi.GetID() {
 		return false
 	}
 	otherPayload, ok := mpi.GetPayload().(string)

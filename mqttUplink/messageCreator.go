@@ -1,13 +1,14 @@
 package mqttUplink
 
 import (
-	"errors"
 	"fmt"
 
 	components "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
 	DBC "github.com/LoRaWanSoFa/LoRaWanSoFa/DBC/DatabaseConnector"
 )
 
+// MessageCreator is a Helper interface that creates a MessageUplinkI type from
+// bytes.
 type MessageCreator interface {
 	CreateMessage(payload []byte, devEui string) (components.MessageUplinkI, error)
 }
@@ -15,9 +16,10 @@ type MessageCreator interface {
 type messageCreator struct {
 }
 
-// A messageCreator is created, the purpose of the MessageCreator is to
-// convert the message, that comes in from a payload and the devEUI as bytes,
-// to the MessageUplinkI format for further use.
+// NewMessageCreator is the constructor for a MessageCreator.
+// The purpose of the MessageCreator is to convert the message, that comes in
+// from a payload and the devEUI as bytes, to the MessageUplinkI format for
+// further use.
 func NewMessageCreator() MessageCreator {
 	mc := new(messageCreator)
 	return mc
@@ -34,8 +36,11 @@ func (m *messageCreator) CreateMessage(payload []byte, devEui string) (component
 	sensors = DBC.GetNodeSensors(devEui)
 	if len(sensors) > 0 {
 		message, err = DBC.AddMessage(devEui)
+		if err != nil {
+			return nil, err
+		}
 	} else {
-		err = errors.New(fmt.Sprintf("There was no header received for %s", devEui))
+		err = fmt.Errorf("There was no header received for %s", devEui)
 		return nil, err
 	}
 
@@ -44,9 +49,9 @@ func (m *messageCreator) CreateMessage(payload []byte, devEui string) (component
 	if b {
 		m.addPayloads(payload[1:], &message, sensors)
 	} else {
-		err = errors.New(fmt.Sprintf("The existing header for %s is not of the "+
+		err = fmt.Errorf("The existing header for %s is not of the "+
 			"right length for the received message. Header length was %d, while "+
-			"payload length was %d.", devEui, headerLength, len(payload[1:])))
+			"payload length was %d.", devEui, headerLength, len(payload[1:]))
 		return nil, err
 	}
 

@@ -8,15 +8,17 @@ import (
 	"github.com/LoRaWanSoFa/LoRaWanSoFa/DBC/DatabaseConnector"
 )
 
+// HeaderHandler is a Helper interface that creates and stores a header.
+//
 type HeaderHandler interface {
 	CreateNewHeader(payload []byte, devEUI string) ([]components.Sensor, error)
-	StoreHeader(header []components.Sensor, devEUI string) error
+	StoreHeader(header []components.Sensor, devEUI string) ([]components.Sensor, []components.Sensor, error)
 }
 
 type headerHandler struct {
 }
 
-// Will create a new HeaderHandler
+// NewHeaderHandler is the constructor for a HeaderHandler
 func NewHeaderHandler() HeaderHandler {
 	h := new(headerHandler)
 	return h
@@ -45,10 +47,11 @@ func (h *headerHandler) CreateNewHeader(payload []byte, devEUI string) ([]compon
 // The current header is compared to the new header and all changes that might
 // occur are updated in the database.
 // Errors returned here will always be database errors.
-func (h *headerHandler) StoreHeader(newHeader []components.Sensor, devEUI string) error {
+// also
+func (h *headerHandler) StoreHeader(newHeader []components.Sensor, devEUI string) ([]components.Sensor, []components.Sensor, error) {
 	oldHeader, err := DatabaseConnector.GetFullHeader(devEUI)
 	if err != nil {
-		return err
+		return nil, nil, err
 	}
 	var headerOrderChanges, activationChanged []components.Sensor
 
@@ -56,14 +59,14 @@ func (h *headerHandler) StoreHeader(newHeader []components.Sensor, devEUI string
 		if b, position := h.containsSensor(oldHeader[i], newHeader); b {
 			sensor := newHeader[position]
 			newHeader = append(newHeader[:i], newHeader[i+1:]...)
-			oldHeader[i].Soft_deleted = false
+			oldHeader[i].SoftDeleted = false
 			activationChanged = append(activationChanged, oldHeader[i])
 			if sensor.HeaderOrder != oldHeader[i].HeaderOrder {
 				oldHeader[i].HeaderOrder = sensor.HeaderOrder
 				headerOrderChanges = append(headerOrderChanges, oldHeader[i])
 			}
-		} else if !oldHeader[i].Soft_deleted {
-			oldHeader[i].Soft_deleted = true
+		} else if !oldHeader[i].SoftDeleted {
+			oldHeader[i].SoftDeleted = true
 			activationChanged = append(activationChanged, oldHeader[i])
 		}
 	}
@@ -77,7 +80,7 @@ func (h *headerHandler) StoreHeader(newHeader []components.Sensor, devEUI string
 		//TODO: DatabaseConnector.ChangeSensorOrder(headerOrderChanges)
 	}
 
-	return nil
+	return newHeader, activationChanged, err
 }
 
 // Helper method to check if a sensor is contained in a set of Sensors, when it
@@ -119,12 +122,12 @@ func (h *headerHandler) createSensor(payload []byte) components.Sensor {
 	numberOfValues = numberOfValues << 2 >> 5
 	sensor.NumberOfValues = int(numberOfValues)
 
-	sensor.Soft_deleted = false
+	sensor.SoftDeleted = false
 
 	return sensor
 }
 
 // Method that checks if the received payload is of a valid size.
-func (hc *headerHandler) checkLength(payload []byte) bool {
+func (h *headerHandler) checkLength(payload []byte) bool {
 	return len(payload)%3 == 1
 }
