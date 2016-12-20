@@ -2,6 +2,7 @@ package DatabaseConnector
 
 import "time"
 
+//WorkerQueue contains a channel with WorkRequests
 var WorkerQueue chan chan WorkRequest
 var workers chan Worker
 var stop bool
@@ -12,10 +13,9 @@ func stopWorker() bool {
 		if ok {
 			w.stop()
 			return true
-		} else {
-			//channel workers is nil / not initialized
-			return false
 		}
+		//channel workers is nil / not initialized
+		return false
 	default:
 		//No workers left
 		return false

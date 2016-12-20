@@ -1,4 +1,4 @@
-//This package handels the communication with the database.
+//Package DatabaseConnector handels the communication with the database.
 //It only contains prepared querys that are needed for the backend.
 //It has a maximum amount of querys that can happen simultaniously
 package DatabaseConnector
@@ -12,9 +12,11 @@ import (
 	"time"
 
 	mdl "github.com/LoRaWanSoFa/LoRaWanSoFa/Components"
+	//Postgress database/sql implementation
 	_ "github.com/lib/pq"
 )
 
+//DatabaseConnector contains the connection to the database and all the prepared statements that are used.
 type DatabaseConnector struct {
 	Database                        *sql.DB
 	checkDevEUISTMT                 *sql.Stmt
@@ -30,6 +32,11 @@ type DatabaseConnector struct {
 	updateSensorOrderSTMT           *sql.Stmt
 }
 
+//WorkRequest is ment to store work for in the Dispatcher. These should be querys.
+//Arguments for a stament are passed as an array in the interface{}
+//Results can be passed back via the the result channel in an WorkResult.
+//F is a function wherein the query is executed and proccesed.
+//Keep this function as short as possible because it is blocking one DBCworker
 type WorkRequest struct {
 	Query         string
 	ResultChannel chan (WorkResult)
@@ -37,6 +44,8 @@ type WorkRequest struct {
 	F             func(w *WorkRequest)
 }
 
+//WorkResult is a result from a WorkRequest.
+//Contains a generic Result and a error interface.
 type WorkResult struct {
 	Result interface{}
 	err    error
@@ -50,9 +59,13 @@ func newDBC(db *sql.DB) *DatabaseConnector {
 
 var instantiated *DatabaseConnector
 var once sync.Once
+
+//WorkQueue where works get put in for the DatabaseConnector.
 var WorkQueue = make(chan WorkRequest, 100)
 
-// Get the instantiated instance of the DatabaseConnector or create it.
+//GetInstance gets the instantiated instance of the DatabaseConnector or create it.
+//When creating it will use the configuration to set up the connection.
+//IDEA move the sql.Open function to the Connect function. As this code gets executed only once here it means that after closing the connection there is no way to open it again.
 func GetInstance() *DatabaseConnector {
 	once.Do(func() {
 		settings := mdl.GetConfiguration().Db
@@ -69,6 +82,9 @@ func GetInstance() *DatabaseConnector {
 	return instantiated
 }
 
+//Connect will Ping the database, which actualy opens the connection.
+//After this it will setup all the prepared statements.
+//It will return an error as soon as it finds a problem.
 func Connect() error {
 	//IDEA move sql.Open to here so we can reconnect.
 	db := GetInstance()
@@ -125,11 +141,13 @@ func Connect() error {
 	return err
 }
 
+//Close wil call the close() function on the connection.
+//This however means that the connection cannot be opened again.
 func Close() error {
 	return GetInstance().Database.Close()
 }
 
-// Checks if the devEUI exists in the database.
+//CheckDevEUI Checks if the devEUI exists in the database.
 // Uses a database worker to execute the query.
 func CheckDevEUI(devEUI string) bool {
 	//log.Println(devEUI)
@@ -157,7 +175,7 @@ func CheckDevEUI(devEUI string) bool {
 	return exists
 }
 
-//Store a message
+//AddMessage Adds a message into the messages table and returnes an MessageUplink with the id of the inserted record.
 func AddMessage(devEUI string) (mdl.MessageUplinkI, error) {
 	//create response channel
 	result := make(chan WorkResult)
@@ -167,7 +185,7 @@ func AddMessage(devEUI string) (mdl.MessageUplinkI, error) {
 	args[0] = devEUI
 	//create and add new WorkRequest
 	WorkQueue <- WorkRequest{Query: "", Arguments: args, ResultChannel: result, F: func(w *WorkRequest) {
-		var messageId int64
+		var messageID int64
 		rows, err := GetInstance().insertMessageSTMT.Query(w.Arguments...)
 
 		checkErr(err)
@@ -179,11 +197,11 @@ func AddMessage(devEUI string) (mdl.MessageUplinkI, error) {
 		defer rows.Close()
 
 		rows.Next()
-		err = rows.Scan(&messageId)
+		err = rows.Scan(&messageID)
 		if err != nil {
 			w.ResultChannel <- WorkResult{Result: 0, err: err}
 		}
-		w.ResultChannel <- WorkResult{Result: messageId, err: nil}
+		w.ResultChannel <- WorkResult{Result: messageID, err: nil}
 	}}
 	response := <-result
 	if response.err != nil {
@@ -195,7 +213,7 @@ func AddMessage(devEUI string) (mdl.MessageUplinkI, error) {
 	return message, response.err
 }
 
-//Get a message
+//StoreMessagePayloads Get a message
 func StoreMessagePayloads(message mdl.MessageUplinkI) error {
 	if message == nil {
 		return errors.New("nil given as message parameter")
@@ -212,7 +230,7 @@ func StoreMessagePayloads(message mdl.MessageUplinkI) error {
 	for _, payload := range payloads {
 		parameters = make([]interface{}, 0)
 		parameters = append(parameters, message.GetId())               //message id
-		parameters = append(parameters, payload.GetSensor().Id)        //sensor id
+		parameters = append(parameters, payload.GetSensor().ID)        //sensor id
 		parameters = append(parameters, payload.GetPayload().(string)) //payload
 		//log.Printf("parameters: %+v", parameters)
 		err = insertPayload(parameters)
@@ -251,7 +269,7 @@ func insertPayload(parameters []interface{}) error {
 	return nil
 }
 
-//Stores a DownlinkMessage which has an id,payload and deveui set.
+//StoreDownlinkMessage Stores a DownlinkMessage which has an id,payload and deveui set.
 //if no time is set NOW() will be used
 func StoreDownlinkMessage(message *mdl.MessageDownLink) error {
 	if message.Id != 0 {
@@ -291,7 +309,7 @@ func addDownlinkMessage(message *mdl.MessageDownLink) error {
 	args[1] = message.Time.UTC().Round(time.Second).Format(time.RFC3339)
 	//create and add new WorkRequest
 	WorkQueue <- WorkRequest{Query: "", Arguments: args, ResultChannel: result, F: func(w *WorkRequest) {
-		var messageId int64
+		var messageID int64
 		rows, err := GetInstance().insertDownlinkMessageSTMT.Query(w.Arguments...)
 
 		checkErr(err)
@@ -303,11 +321,11 @@ func addDownlinkMessage(message *mdl.MessageDownLink) error {
 		defer rows.Close()
 
 		rows.Next()
-		err = rows.Scan(&messageId)
+		err = rows.Scan(&messageID)
 		if err != nil {
 			w.ResultChannel <- WorkResult{Result: 0, err: err}
 		}
-		w.ResultChannel <- WorkResult{Result: messageId, err: nil}
+		w.ResultChannel <- WorkResult{Result: messageID, err: nil}
 	}}
 	response := <-result
 	if response.err != nil {
@@ -319,7 +337,7 @@ func addDownlinkMessage(message *mdl.MessageDownLink) error {
 	return response.err
 }
 
-//Get sensors that belong to one node
+//GetNodeSensors Gets the sensors that belong to one node
 func GetNodeSensors(devEUI string) []mdl.Sensor {
 	result := make(chan WorkResult)
 	defer close(result)
@@ -336,21 +354,21 @@ func GetNodeSensors(devEUI string) []mdl.Sensor {
 		}
 		sensors := make([]mdl.Sensor, 0)
 		var id int64
-		var number_of_values, lenght_of_values, header_order, data_type int
-		var conversion_expression string
+		var numberOfValues, lenghtOfValues, headerOrder, dataType int
+		var conversionExpression string
 
 		for rows.Next() {
-			err = rows.Scan(&id, &number_of_values, &lenght_of_values, &header_order, &conversion_expression, &data_type)
+			err = rows.Scan(&id, &numberOfValues, &lenghtOfValues, &headerOrder, &conversionExpression, &dataType)
 			if err != nil {
 				panic(err.Error())
 			}
 			s := mdl.NewHeaderSensor(
 				id,
-				number_of_values,
-				lenght_of_values,
-				header_order,
-				data_type,
-				conversion_expression)
+				numberOfValues,
+				lenghtOfValues,
+				headerOrder,
+				dataType,
+				conversionExpression)
 			sensors = append(sensors, s)
 		}
 		w.ResultChannel <- WorkResult{Result: sensors, err: err}
@@ -381,28 +399,28 @@ func GetFullHeader(devEUI string) ([]mdl.Sensor, error) {
 		}
 		sensors := make([]mdl.Sensor, 0)
 		var sid, stid int64
-		var io_address, io_type, number_of_values, lenght_of_values, header_order, data_type, sensor_type int
-		var conversion_expression, description string
-		var soft_deleted bool
+		var ioAddress, ioType, numberOfValues, lenghtOfValues, headerOrder, dataType, sensorType int
+		var conversionExpression, description string
+		var softDeleted bool
 
 		for rows.Next() {
-			err = rows.Scan(&sid, &stid, &io_address, &io_type, &number_of_values, &lenght_of_values, &header_order, &conversion_expression, &description, &data_type, &sensor_type, &soft_deleted)
+			err = rows.Scan(&sid, &stid, &ioAddress, &ioType, &numberOfValues, &lenghtOfValues, &headerOrder, &conversionExpression, &description, &dataType, &sensorType, &softDeleted)
 			if err != nil {
 				panic(err.Error())
 			}
 			s := mdl.NewSensor(
 				sid,
 				stid,
-				io_address,
-				io_type,
-				sensor_type,
-				number_of_values,
-				lenght_of_values,
-				header_order,
-				data_type,
+				ioAddress,
+				ioType,
+				sensorType,
+				numberOfValues,
+				lenghtOfValues,
+				headerOrder,
+				dataType,
 				description,
-				conversion_expression,
-				soft_deleted)
+				conversionExpression,
+				softDeleted)
 			sensors = append(sensors, s)
 		}
 		w.ResultChannel <- WorkResult{Result: sensors, err: err}
@@ -417,6 +435,8 @@ func GetFullHeader(devEUI string) ([]mdl.Sensor, error) {
 	return sensors, nil
 }
 
+//AddSensor Adds the sensor in the database.
+//If needed it will create the sensor type first.
 func AddSensor(sensor mdl.Sensor) error {
 	//does s.type exist?
 	//no -> insert new type
@@ -424,7 +444,8 @@ func AddSensor(sensor mdl.Sensor) error {
 	return nil
 }
 
-func getSensorTypeId(sensorType int) (int64, error) {
+//getSensorTypeID gets the sensorType id if it exist else it return 0
+func getSensorTypeID(sensorType int) (int64, error) {
 	result := make(chan WorkResult)
 	defer close(result)
 	args := make([]interface{}, 1)
@@ -444,60 +465,19 @@ func getSensorTypeId(sensorType int) (int64, error) {
 	return workResult.Result.(int64), workResult.err
 }
 
+//ChangeSensorActivationState calls for every sensor the ChangeSingleSensorActivationState function.
 func ChangeSensorActivationState(sensors []mdl.Sensor) {
 	for _, sensor := range sensors {
 		ChangeSingleSensorActivationState(sensor)
 	}
 }
 
-func UpdateHeader(devEUI string, newheader []mdl.Sensor) error {
-	//check first
-	if len(newheader) == 0 {
-		return errors.New("No Sensors given")
-	}
-	if devEUI == "" {
-		return errors.New("Deveui must not be empty")
-	}
-	if !CheckDevEUI(devEUI) {
-		return errors.New("Deveui does not exist")
-	}
-	oldheader := GetNodeSensors(devEUI)
-	newSensortyps := make(map[string]mdl.Sensor)
-	if len(oldheader) == 0 {
-		//old header does not exist, insert new ones
-
-		for _, newS := range newheader {
-			newSensortyps[fmt.Sprintf("%s %d", newS.Conversion_expression, newS.DataType)] = newS
-		}
-		for _, sensor := range newSensortyps {
-			//Query: insert new sensortypes if not exist
-			log.Printf("insert into sensor_typs where !%+v and !%+v on dubplicate ignore", sensor.Conversion_expression, sensor.DataType)
-		}
-		//Query: insert new sensors with Deveui
-		return nil
-	}
-	sensortyps := make(map[string]bool)
-	for _, s := range oldheader {
-		sensortyps[fmt.Sprintf("%s %d", s.Conversion_expression, s.DataType)] = true
-	}
-	log.Printf("sensortyps map: %+v", sensortyps)
-	for _, newS := range newheader {
-		//check which newS is not in sensortyps; add those to newSensortyps
-		newS.Conversion_expression = ""
-	}
-	//Query: softdelete where Deveui
-	//Query: un-delete where Deveui and sensr iotype/ioaddress/sensorstype
-	//Query: insert new sensortypes
-	//Query: insert new sensors with Deveui
-
-	return nil
-}
-
+//ChangeSingleSensorActivationState sets the softdelete state in the database.
 func ChangeSingleSensorActivationState(sensor mdl.Sensor) {
 	args := make([]interface{}, 2)
-	log.Printf("deleted: %+v", sensor.Soft_deleted)
-	args[0] = sensor.Soft_deleted
-	args[1] = sensor.Id
+	log.Printf("deleted: %+v", sensor.SoftDeleted)
+	args[0] = sensor.SoftDeleted
+	args[1] = sensor.ID
 	WorkQueue <- WorkRequest{Query: "", Arguments: args, ResultChannel: nil, F: func(w *WorkRequest) {
 		_, err := GetInstance().changeSensorActivationStateSTMT.Exec(args...)
 		if err != nil {

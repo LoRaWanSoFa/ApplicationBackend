@@ -1,5 +1,6 @@
 package DatabaseConnector
 
+//NewWorker returns a new worker with the workerQueue set.
 func NewWorker(id int, workerQueue chan chan WorkRequest) Worker {
 	// Create, and return the worker.
 	worker := Worker{
@@ -11,6 +12,8 @@ func NewWorker(id int, workerQueue chan chan WorkRequest) Worker {
 	return worker
 }
 
+//Worker contains an ID, a channel is the channel where it gets work from.
+//QuitChan is a channel that tells to stop the worker.
 type Worker struct {
 	ID          int
 	Work        chan WorkRequest

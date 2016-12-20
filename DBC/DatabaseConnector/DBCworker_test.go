@@ -6,8 +6,8 @@ import (
 )
 
 func TestNewWorker(t *testing.T) {
-	WorkerQueue_test := make(chan chan WorkRequest, 1)
-	worker := NewWorker(1, WorkerQueue_test)
+	WorkerQueueTest := make(chan chan WorkRequest, 1)
+	worker := NewWorker(1, WorkerQueueTest)
 	if 1 != worker.ID {
 		t.Errorf("Expected %d, was %d", 1, worker.ID)
 	}
