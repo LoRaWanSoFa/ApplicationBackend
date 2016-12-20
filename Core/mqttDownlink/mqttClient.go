@@ -12,6 +12,7 @@ import (
 	"github.com/apex/log/handlers/text"
 )
 
+// MqttClient is the interface for sending downlink mqtt Messages
 type MqttClient interface {
 	Connect() error
 	Disconnect()
@@ -22,6 +23,7 @@ type mqttClient struct {
 	client mqtt.Client
 }
 
+// New is Constructor for the Downlink MqttClient
 func New() MqttClient {
 	downClient := new(mqttClient)
 	return downClient

@@ -14,14 +14,14 @@ import (
 var testMessage = components.NewMessageUplink(123, "1234")
 
 var testData = struct {
-	nodeId    string
-	sensorId  string
+	nodeID    string
+	sensorID  string
 	longitude float64
 	latitude  float64
 	payload   url.Values
 }{"AB13A02BD", "103", 40.730610, -73.935242, url.Values{"key": {"Value"}}}
 
-var testConnector RestUplinkConnector
+var testConnector Connector
 var testServer *http.Server
 var l net.Listener
 
@@ -52,25 +52,25 @@ func tearDown() {
 }
 
 func TestNewNode(t *testing.T) {
-	testConnector.NewNode(testData.nodeId, testData.longitude, testData.latitude)
+	testConnector.NewNode(testData.nodeID, testData.longitude, testData.latitude)
 }
 
 func TestUpdateNode(t *testing.T) {
-	testConnector.UpdateNode(testData.nodeId, testData.longitude, testData.latitude)
+	testConnector.UpdateNode(testData.nodeID, testData.longitude, testData.latitude)
 }
 
 func TestDeleteNode(t *testing.T) {
-	testConnector.DeleteNode(testData.nodeId)
+	testConnector.DeleteNode(testData.nodeID)
 }
 
 func TestNewSensor(t *testing.T) {
-	testConnector.NewSensor(testData.nodeId, testData.sensorId)
+	testConnector.NewSensor(testData.nodeID, testData.sensorID)
 }
 
 func TestDeleteSensor(t *testing.T) {
-	testConnector.DeleteSensor(testData.nodeId, testData.sensorId)
+	testConnector.DeleteSensor(testData.nodeID, testData.sensorID)
 }
 
 func TestNewData(t *testing.T) {
-	testConnector.NewData(testData.nodeId, testMessage)
+	testConnector.NewData(testData.nodeID, testMessage)
 }

@@ -27,13 +27,13 @@ func MessageIndex(w http.ResponseWriter, r *http.Request) {
 
 func MessageShow(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	var messageId int
+	var messageID int
 	var err error
-	if messageId, err = strconv.Atoi(vars["messageId"]); err != nil {
+	if messageID, err = strconv.Atoi(vars["messageID"]); err != nil {
 		panic(err)
 	}
-	message := RepoFindMessage(int64(messageId))
-	if message.Id > 0 {
+	message := RepoFindMessage(int64(messageID))
+	if message.ID > 0 {
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.WriteHeader(http.StatusOK)
 		if err := json.NewEncoder(w).Encode(message); err != nil {

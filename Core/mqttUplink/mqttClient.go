@@ -16,6 +16,8 @@ import (
 
 var logFatal = log.Fatal
 
+// MqttClient is the client that will receive message from the
+// network backend.
 type MqttClient interface {
 	Connect() error
 	Disconnect()
@@ -26,6 +28,7 @@ type mqttClient struct {
 	client mqtt.Client
 }
 
+// New is the constructor for the Mqtt-Uplink-Client.
 func New() MqttClient {
 	client := new(mqttClient)
 	return client
@@ -46,9 +49,12 @@ func uplinkMessageHandler(client mqtt.Client, appEUI types.AppEUI, devEUI types.
 			if err != nil {
 				logFatal(err)
 			} else {
-				err = hHandler.StoreHeader(header, devEUI.GoString())
+				newSensors, activationChanged, err := hHandler.StoreHeader(header, devEUI.GoString())
 				if err != nil {
 					logFatal(err)
+				} else {
+					dist.InputNewSensors(newSensors, devEUI.GoString())
+					dist.DeleteSensors(activationChanged, devEUI.GoString())
 				}
 			}
 		} else if flag>>5 == 1 {

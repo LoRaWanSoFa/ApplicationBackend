@@ -21,7 +21,7 @@ func main() {
 	log.Println("Start sending data now:")
 
 	sensor := mdl.NewHeaderSensor(1, 0, 0, 0, 0, "conversion_expression") //soft_deleted = false
-	sensor.Soft_deleted = true
+	sensor.SoftDeleted = true
 	dbc.ChangeSingleSensorActivationState(sensor)
 
 	time.Sleep(8000 * time.Millisecond) // Let program run for ever till panic?

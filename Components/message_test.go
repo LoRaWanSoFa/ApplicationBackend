@@ -4,8 +4,8 @@ import "testing"
 
 func TestNewMessageUplink(t *testing.T) {
 	m := NewMessageUplink(23, "devEUI")
-	if m.GetId() != 23 {
-		t.Errorf("Expected %d, was %d", 23, m.GetId())
+	if m.GetID() != 23 {
+		t.Errorf("Expected %d, was %d", 23, m.GetID())
 	}
 	if len(m.GetPayloads()) != 0 {
 		t.Errorf("Expected %d, was %d", 0, len(m.GetPayloads()))
@@ -60,7 +60,7 @@ func TestToJson(t *testing.T) {
 	m.AddPayloadString("nose", secondSensor)
 	m.AddPayloadString("cheese", secondSensor)
 
-	json := m.ToJson()
+	json := m.ToJSON()
 	if len(json["77"]) != 2 {
 		t.Errorf("Json should contain 2 entries for id 77, found %d", len(json))
 	} else if json["77"][0] != "test" {

@@ -22,6 +22,8 @@ const (
 	conversionBool                            // 5
 )
 
+// ByteConverter is used to convert slices of byte to other data types, that are
+// then afterwards again converted to string for further usage.
 type ByteConverter interface {
 	ConvertSingleValue(payload []byte, conversion int) (string, error)
 }
@@ -29,7 +31,7 @@ type ByteConverter interface {
 type byteConverter struct {
 }
 
-// Creates a new MessageConverter
+// New Creates a new MessageConverter
 func New() ByteConverter {
 	return new(byteConverter)
 }
@@ -159,7 +161,6 @@ func convertBool(payload []byte) (string, error) {
 	}
 	if payload[0] > 0 {
 		return "true", nil
-	} else {
-		return "false", nil
 	}
+	return "false", nil
 }

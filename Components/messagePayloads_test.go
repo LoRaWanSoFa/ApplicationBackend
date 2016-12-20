@@ -15,11 +15,11 @@ func TestMessagPayloadByte(t *testing.T) {
 
 	//Test other geter and setters
 	mp.SetPayload([]byte("testbyte"))
-	mp.SetId(23)
+	mp.SetID(23)
 	s := NewHeaderSensor(6, 1, 1, 1, 1, "+1")
 	mp.SetSensor(s)
-	if mp.GetId() != 23 {
-		t.Errorf("Could not get correct Id: %+v", mp.GetId())
+	if mp.GetID() != 23 {
+		t.Errorf("Could not get correct ID: %+v", mp.GetID())
 	}
 	payload := mp.GetPayload().([]byte)
 	if string(payload) != "testbyte" {
@@ -42,11 +42,11 @@ func TestMessagPayloadString(t *testing.T) {
 	}
 	//Test other geter and setters
 	mp.SetPayload("testbyte")
-	mp.SetId(23)
+	mp.SetID(23)
 	s := NewHeaderSensor(6, 1, 1, 1, 1, "+1")
 	mp.SetSensor(s)
-	if mp.GetId() != 23 {
-		t.Errorf("Could not get correct Id: %+v", mp.GetId())
+	if mp.GetID() != 23 {
+		t.Errorf("Could not get correct ID: %+v", mp.GetID())
 	}
 	if mp.GetPayload() != "testbyte" {
 		t.Errorf("Could not get correct Payload: %+v", mp.GetPayload())
@@ -84,8 +84,8 @@ func TestMessagePayloadEquals(t *testing.T) {
 	m.AddPayload([]byte("nose"), firstSensor)
 	m.AddPayload([]byte("test"), firstSensor)
 	m.AddPayloadString("test", firstSensor)
-	m.GetPayloads()[7].SetId(1)
-	m.GetPayloads()[8].SetId(1)
+	m.GetPayloads()[7].SetID(1)
+	m.GetPayloads()[8].SetID(1)
 
 	p := m.GetPayloads()
 	for i := range testData {
