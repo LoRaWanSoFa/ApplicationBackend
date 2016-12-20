@@ -1,3 +1,4 @@
+// Package mqttUplink is used to receive and handle uplink messages.
 package mqttUplink
 
 import (

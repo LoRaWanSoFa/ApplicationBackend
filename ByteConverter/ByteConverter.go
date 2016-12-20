@@ -1,3 +1,4 @@
+// Package byteConverter is used to convert bytes to different datatypes.
 package byteConverter
 
 import (

@@ -1,3 +1,4 @@
+// Package mqttDownlink is used to send downlink messages to the network backend.
 package mqttDownlink
 
 import (

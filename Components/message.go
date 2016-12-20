@@ -1,3 +1,4 @@
+// Package components contains the models for the database and the configuration for the application.
 package components
 
 import (

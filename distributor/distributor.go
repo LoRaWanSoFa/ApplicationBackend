@@ -1,3 +1,4 @@
+// Package distributor is used to distribute messages through the ApplicationBackend.
 package distributor
 
 import (
@@ -5,11 +6,11 @@ import (
 	"log"
 	"strconv"
 
-	components "github.com/LoRaWanSoFa/ApplicationBackend/Components"
 	"github.com/LoRaWanSoFa/ApplicationBackend/ByteConverter"
+	"github.com/LoRaWanSoFa/ApplicationBackend/Components"
+	"github.com/LoRaWanSoFa/ApplicationBackend/DBC/DatabaseConnector"
 	"github.com/LoRaWanSoFa/ApplicationBackend/mqttDownlink"
 	"github.com/LoRaWanSoFa/ApplicationBackend/restUplinkConnector"
-	"github.com/LoRaWanSoFa/ApplicationBackend/DBC/DatabaseConnector"
 )
 
 var logFatal = log.Fatal

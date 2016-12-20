@@ -1,3 +1,4 @@
+// Package webserver is a restful JSON API for the ApplicationFrontend.
 package webserver
 
 import (
