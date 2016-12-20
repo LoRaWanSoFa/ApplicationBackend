@@ -1,3 +1,4 @@
+// Package restUplink is used to send uplink messages to the ApplicationFrontend.
 package restUplink
 
 import (
