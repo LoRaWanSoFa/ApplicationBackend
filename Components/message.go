@@ -74,7 +74,7 @@ func (m *MessageUplink) ToJson() url.Values {
 	json := url.Values{}
 	payloads := m.GetPayloads()
 	for i := range payloads {
-		idString := strconv.FormatInt(payloads[i].GetSensor().Id, 10)
+		idString := strconv.FormatInt(payloads[i].GetSensor().ID, 10)
 		json.Add(idString, payloads[i].GetPayload().(string))
 	}
 	return json
